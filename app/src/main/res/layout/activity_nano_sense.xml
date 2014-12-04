@@ -20,21 +20,32 @@
             android:layout_height="match_parent"
             android:background="@color/white_solid">
 
-            <Button
-                android:id="@+id/launcher"
+            <FrameLayout
+                android:id="@+id/launcher_extended"
                 android:layout_width="280dp"
                 android:layout_height="match_parent"
                 android:background="@color/white_solid"
-                android:text="oYo!!"
-            />
+                android:text="oYo!!">
+
+                <fragment
+                    android:id="@+id/launcher_compact"
+                    android:layout_width="@dimen/content_drawer_offset"
+                    android:layout_height="match_parent"
+                    android:name="gl.iglou.studio.nanosense.LauncherCompactFragment"
+                />
+
+            </FrameLayout>
+
             <FrameLayout
                 android:id="@+id/content_frag"
-                android:layout_marginLeft="80dp"
+                android:layout_marginLeft="@dimen/content_drawer_offset"
                 android:layout_width="520dp"
                 android:layout_height="match_parent"
                 android:background="@color/white_solid"
-                android:elevation="8dp"
+                android:elevation="4dp"
             />
+
+
 
         </FrameLayout>
 

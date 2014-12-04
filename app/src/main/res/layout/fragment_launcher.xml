@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="@dimen/content_drawer_offset"
+    android:layout_height="match_parent"
+    android:background="@color/white_solid"
+    android:paddingTop="20dp">
+
+    <ImageButton
+        android:id="@+id/laucher_btn_0"
+        android:layout_width="@dimen/content_drawer_offset"
+        android:layout_height="@dimen/content_drawer_offset"
+        android:src="@drawable/ic_drawer"
+
+        />
+
+    <ImageButton
+        android:id="@+id/laucher_btn_1"
+        android:layout_width="@dimen/content_drawer_offset"
+        android:layout_height="@dimen/content_drawer_offset"
+        android:src="@drawable/ic_drawer"
+
+        />
+
+    <ImageButton
+        android:id="@+id/laucher_btn_2"
+        android:layout_width="@dimen/content_drawer_offset"
+        android:layout_height="@dimen/content_drawer_offset"
+        android:src="@drawable/ic_drawer"
+
+        />
+
+</LinearLayout>
