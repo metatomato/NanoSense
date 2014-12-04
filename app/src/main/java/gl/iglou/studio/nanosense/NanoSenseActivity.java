@@ -1,32 +1,32 @@
 package gl.iglou.studio.nanosense;
 
 import android.app.Activity;
-
+import android.graphics.Color;
+import android.support.v7.app.ActionBarActivity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 
-public class NanoSenseActivity extends Activity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class NanoSenseActivity extends ActionBarActivity
+        implements BluetoothServiceFragment.NavigationDrawerCallbacks {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-
+    private BluetoothServiceFragment mBluetoothServiceFragment;
+    private Toolbar mToolbar;
+    private View mContentView;
+    private DrawerLayout mDrawerLayout;
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
@@ -37,14 +37,65 @@ public class NanoSenseActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nano_sense);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
+        mBluetoothServiceFragment = (BluetoothServiceFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
+/*
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
+        mBluetoothServiceFragment.setUp(
                 R.id.navigation_drawer,
+                R.id.content_frag,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+*/
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mContentView = findViewById(R.id.content_frag);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+
+        if (mToolbar  != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+
+        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
+                mToolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        )
+        {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+                return;
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                return;
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset)
+            {
+                super.onDrawerSlide(drawerView,slideOffset);
+                float moveFactor = (mBluetoothServiceFragment.getView().getWidth() * slideOffset);
+
+                mContentView.setTranslationX(moveFactor);
+            }
+        };
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -71,20 +122,20 @@ public class NanoSenseActivity extends Activity
     }
 
     public void restoreActionBar() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        //actionBar.setTitle(mTitle);
+        getSupportActionBar().setTitle("NanoSense");
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (!mBluetoothServiceFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.nano_sense, menu);
+            //getMenuInflater().inflate(R.menu.nano_sense, menu);
+            getMenuInflater().inflate(R.menu.global, menu);
             restoreActionBar();
             return true;
         }

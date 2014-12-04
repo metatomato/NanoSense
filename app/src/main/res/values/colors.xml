@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="white_solid" type="color">#ffffff</item>
+    <item name="green_solid" type="color">#00ff00</item>
+    <item name="color_primary" type="color">#ff9800</item>
+    <item name="color_primary_dark" type="color">#f57c00</item>
+
+</resources>
