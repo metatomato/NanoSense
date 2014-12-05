@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/launcher_container"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     android:layout_width="@dimen/content_drawer_offset"
     android:layout_height="match_parent"
     android:background="@color/white_solid"
     android:paddingTop="20dp">
 
     <ImageButton
-        android:id="@+id/laucher_btn_0"
-        android:layout_width="@dimen/content_drawer_offset"
-        android:layout_height="@dimen/content_drawer_offset"
-        android:src="@drawable/ic_drawer"
+        android:id="@+id/launcher_btn_0"
+        android:layout_width="@dimen/launcher_icon"
+        android:layout_height="@dimen/launcher_icon"
+        android:src="@drawable/perm_group_audio_settings"
+        android:background="@color/white_solid"
+        style="?android:attr/borderlessButtonStyle"
+        />
+
+    <ImageButton
+        android:id="@+id/launcher_btn_1"
+        android:layout_width="@dimen/launcher_icon"
+        android:layout_height="@dimen/launcher_icon"
+        android:src="@drawable/perm_group_bluetooth"
+        android:background="@color/white_solid"
+        style="?android:attr/borderlessButtonStyle"
 
         />
 
     <ImageButton
-        android:id="@+id/laucher_btn_1"
-        android:layout_width="@dimen/content_drawer_offset"
-        android:layout_height="@dimen/content_drawer_offset"
-        android:src="@drawable/ic_drawer"
-
+        android:id="@+id/launcher_btn_2"
+        android:layout_width="@dimen/launcher_icon"
+        android:layout_height="@dimen/launcher_icon"
+        android:src="@drawable/perm_group_system_tools"
+        android:background="@color/white_solid"
+        style="?android:attr/borderlessButtonStyle"
         />
 
     <ImageButton
-        android:id="@+id/laucher_btn_2"
-        android:layout_width="@dimen/content_drawer_offset"
-        android:layout_height="@dimen/content_drawer_offset"
-        android:src="@drawable/ic_drawer"
-
+        android:id="@+id/launcher_btn_3"
+        android:layout_width="@dimen/launcher_icon"
+        android:layout_height="@dimen/launcher_icon"
+        android:src="@drawable/perm_group_wallpaper"
+        android:background="@color/white_solid"
+        style="?android:attr/borderlessButtonStyle"
         />
 
 </LinearLayout>

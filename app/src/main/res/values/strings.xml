@@ -10,4 +10,8 @@
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
 
+    <string name="tag_rocket_0">0</string>
+    <string name="tag_rocket_1">1</string>
+    <string name="tag_rocket_2">2</string>
+
 </resources>

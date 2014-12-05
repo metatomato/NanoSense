@@ -3,27 +3,29 @@ package gl.iglou.studio.nanosense;
 import android.app.Activity;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.TextView;
 
 
-public class NanoSenseActivity extends ActionBarActivity
-        implements BluetoothServiceFragment.NavigationDrawerCallbacks {
+public class NanoSenseActivity extends ActionBarActivity {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-    private BluetoothServiceFragment mBluetoothServiceFragment;
+    private static final String TAG = "NanoSenseActivity";
+
+    private View mNavigationDrawer;
     private Toolbar mToolbar;
     private View mContentView;
     private DrawerLayout mDrawerLayout;
@@ -37,20 +39,11 @@ public class NanoSenseActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nano_sense);
 
-        mBluetoothServiceFragment = (BluetoothServiceFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-/*
-        // Set up the drawer.
-        mBluetoothServiceFragment.setUp(
-                R.id.navigation_drawer,
-                R.id.content_frag,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-*/
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mContentView = findViewById(R.id.content_frag);
+        mContentView = findViewById(R.id.main_content);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationDrawer = findViewById(R.id.navigation_drawer);
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
 
@@ -86,7 +79,7 @@ public class NanoSenseActivity extends ActionBarActivity
             public void onDrawerSlide(View drawerView, float slideOffset)
             {
                 super.onDrawerSlide(drawerView,slideOffset);
-                float moveFactor = (mBluetoothServiceFragment.getView().getWidth() * slideOffset);
+                float moveFactor = (mNavigationDrawer.getWidth() * slideOffset);
 
                 mContentView.setTranslationX(moveFactor);
             }
@@ -98,28 +91,29 @@ public class NanoSenseActivity extends ActionBarActivity
         mDrawerToggle.syncState();
     }
 
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
+
+    public void contentViewResolver(int tag) {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.main_content, PlaceholderFragment.newInstance(tag ))
                 .commit();
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
+
+    public void launchRocket(View view) {
+        int tag = -1;
+        try {
+            tag = Integer.parseInt((String) view.getTag());
         }
+        catch(NumberFormatException e)
+        {
+            Log.v(TAG, "[" + TAG + "][RockectLaunch] No valid tag found. RocketLaunch aborted!");
+        }
+
+       contentViewResolver(tag);
     }
+
+
 
     public void restoreActionBar() {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
@@ -130,16 +124,10 @@ public class NanoSenseActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mBluetoothServiceFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            //getMenuInflater().inflate(R.menu.nano_sense, menu);
-            getMenuInflater().inflate(R.menu.global, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.global, menu);
+        restoreActionBar();
+        return true;
+
     }
 
     @Override
@@ -167,6 +155,8 @@ public class NanoSenseActivity extends ActionBarActivity
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
+        private String mTextContent = "Holà señor metaTomato!!";
+
         /**
          * Returns a new instance of this fragment for the given section
          * number.
@@ -180,21 +170,27 @@ public class NanoSenseActivity extends ActionBarActivity
         }
 
         public PlaceholderFragment() {
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, 0);
+            this.setArguments(args);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_nano_sense, container, false);
+            TextView text = (TextView)rootView.findViewById(R.id.section_label);
+            text.setText(mTextContent);
             return rootView;
         }
 
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((NanoSenseActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            int id = getArguments().getInt(ARG_SECTION_NUMBER);
+            mTextContent = String.valueOf(id);
+            //TextView text = (TextView) getActivity().findViewById(R.id.section_label);
+            //text.setText( String.valueOf(id));
         }
     }
-
 }

@@ -15,13 +15,13 @@
         <!-- As the main content view, the view below consumes the entire
              space available using match_parent in both dimensions. -->
         <FrameLayout
-            android:id="@+id/container"
+            android:id="@+id/main_content_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white_solid">
 
             <FrameLayout
-                android:id="@+id/launcher_extended"
+                android:id="@+id/launcher"
                 android:layout_width="280dp"
                 android:layout_height="match_parent"
                 android:background="@color/white_solid"
@@ -37,14 +37,14 @@
             </FrameLayout>
 
             <FrameLayout
-                android:id="@+id/content_frag"
+                android:id="@+id/main_content"
                 android:layout_marginLeft="@dimen/content_drawer_offset"
                 android:layout_width="520dp"
                 android:layout_height="match_parent"
                 android:background="@color/white_solid"
+                android:name="gl.iglou.studio.nanosense.NanoSenseActivity$PlaceholderFragment"
                 android:elevation="4dp"
             />
-
 
 
         </FrameLayout>
@@ -57,13 +57,12 @@
              android:layout_gravity="left" instead. -->
         <!-- The drawer is given a fixed width in dp and extends the full height of
              the container. -->
-        <fragment
+        <FrameLayout
             android:id="@+id/navigation_drawer"
             android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:name="gl.iglou.studio.nanosense.BluetoothServiceFragment"
-            tools:layout="@layout/fragment_navigation_drawer" />
+        />
 
     </android.support.v4.widget.DrawerLayout>
 
