@@ -11,17 +11,17 @@ import android.widget.TextView;
 /**
  * Created by metatomato on 07.12.14.
  */
-public class MPFragment extends Fragment{
+public class BTFragment extends Fragment{
 
-    private String mTextContent = "MP";
+    private String mTextContent = "BT";
 
-    public MPFragment() {
+    public BTFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_mp, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_bt, container, false);
         TextView text = (TextView)rootView.findViewById(R.id.section_label);
         text.setText(mTextContent);
         return rootView;

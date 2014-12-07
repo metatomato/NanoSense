@@ -59,9 +59,11 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        updateRocket(v);
-
-        ((NanoSenseActivity)getActivity()).contentViewResolver(NanoSenseActivity.MP_FRAGMENT);
+        if(mRockets.contains(v)) {
+            updateRocket(v);
+            int rocketId = mRockets.indexOf(v);
+            ((NanoSenseActivity) getActivity()).contentViewResolver(rocketId);
+        }
     }
 
 
@@ -78,15 +80,13 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
 
 
     void updateRocket(View v) {
-        if(mRockets.contains(v)) {
-            mActiveRocket = v;
+        mActiveRocket = v;
 
-            setRocketActivation(v,true);
+        setRocketActivation(v,true);
 
-            for(View rocket : mRockets) {
-                if(rocket != mActiveRocket) {
-                    setRocketActivation(rocket,false);
-                }
+        for(View rocket : mRockets) {
+            if(rocket != mActiveRocket) {
+                setRocketActivation(rocket,false);
             }
         }
     }

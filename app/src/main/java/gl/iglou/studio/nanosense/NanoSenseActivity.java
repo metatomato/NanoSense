@@ -20,9 +20,6 @@ import android.widget.TextView;
 
 public class NanoSenseActivity extends ActionBarActivity {
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
     private static final String TAG = "NanoSenseActivity";
 
     public static final int MP_FRAGMENT = 0;
@@ -30,14 +27,13 @@ public class NanoSenseActivity extends ActionBarActivity {
     public static final int SETUP_FRAGMENT = 2;
     public static final int MONITOR_FRAGMENT = 3;
 
+    String[] mFragmentLabel = {"MediaPlayer", "Bluetooth", "Device Setup", "Monitor"};
+
     private View mNavigationDrawer;
     private Toolbar mToolbar;
     private View mContentView;
     private DrawerLayout mDrawerLayout;
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,30 +91,38 @@ public class NanoSenseActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
+
+        contentViewResolver(MP_FRAGMENT);
     }
 
 
     public void contentViewResolver(int fragmentId) {
         FragmentManager fragmentManager = getFragmentManager();
+        Fragment main_content_fragment;
+        switch(fragmentId) {
+            case MP_FRAGMENT :
+                main_content_fragment = new MPFragment();
+                break;
+            case BT_FRAGMENT:
+                main_content_fragment = new BTFragment();
+                break;
+            default:
+                main_content_fragment = new MPFragment();
+        }
+
         fragmentManager.beginTransaction()
-                .replace(R.id.main_content, new MPFragment())
+                .replace(R.id.main_content, main_content_fragment)
                 .commit();
+
+        getSupportActionBar().setTitle(mFragmentLabel[fragmentId]);
     }
 
-
-    public void restoreActionBar() {
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        //actionBar.setTitle(mTitle);
-        getSupportActionBar().setTitle("NanoSense");
-    }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.global, menu);
-        restoreActionBar();
         return true;
-
     }
 
     @Override
