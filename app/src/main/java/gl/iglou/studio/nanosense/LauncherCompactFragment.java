@@ -18,15 +18,10 @@ import java.util.ArrayList;
 public class LauncherCompactFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "LauncherCompactFragment";
-
     private ArrayList<View> mRockets;
-
     private View mActiveRocket;
-
-    private static final float ROCKET_ELEVATION = 4.0f;
     private static final int ROCKET_TINT = R.color.black_alpha;
     private static final int ROCKET_BACKGROUND = R.color.black_alpha_light;
-
     private LauncherCompactCallbacks mCallbacks;
 
     public LauncherCompactFragment() {
@@ -61,10 +56,14 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
         updateRocket(mActiveRocket);
     }
 
+
     @Override
     public void onClick(View v) {
         updateRocket(v);
+
+        ((NanoSenseActivity)getActivity()).contentViewResolver(NanoSenseActivity.MP_FRAGMENT);
     }
+
 
     private ArrayList<View> getRockets() {
         ArrayList<View> result = new ArrayList<View>();
@@ -77,38 +76,36 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
         return result;
     }
 
+
     void updateRocket(View v) {
         if(mRockets.contains(v)) {
             mActiveRocket = v;
 
-            setRocketActive(v);
+            setRocketActivation(v,true);
 
             for(View rocket : mRockets) {
                 if(rocket != mActiveRocket) {
-                    setRocketInactive(rocket);
+                    setRocketActivation(rocket,false);
                 }
             }
         }
     }
 
-    void setRocketActive(View v) {
+
+    void setRocketActivation(View v, boolean activated) {
         ImageView rocket = (ImageView) v;
-
-        final float scale = getResources().getDisplayMetrics().density;
-        int elevation = (int) (ROCKET_ELEVATION * scale + 0.5f);
-
-        //rocket.setElevation(elevation);
-        rocket.getDrawable().setTint(Color.BLACK);
-        rocket.setBackground(getResources().getDrawable(R.drawable.round_rect));
+        if(rocket != null) {
+            if(activated) {
+                rocket.getDrawable().setTint(Color.BLACK);
+                rocket.setBackground(getResources().getDrawable(R.drawable.round_rect));
+            } else {
+                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT));
+                rocket.setBackgroundColor(getResources().getColor(R.color.white_solid));
+            }
+        }
     }
 
 
-    void setRocketInactive(View v) {
-        ImageView rocket = (ImageView) v;
-        //rocket.setElevation(0);
-        rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT));
-        rocket.setBackgroundColor(getResources().getColor(R.color.white_solid));
-    }
 
     public static interface LauncherCompactCallbacks {
         void onRocketLaunch(int rocketId);
