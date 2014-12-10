@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scale xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/perm_group_audio_settings"
+    android:scaleGravity="center"
+    android:scaleHeight="60%"
+    android:scaleWidth="60%" />
+

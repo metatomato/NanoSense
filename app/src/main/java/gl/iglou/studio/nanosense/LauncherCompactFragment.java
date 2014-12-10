@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,16 +50,19 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
 
         for(View rocket : mRockets) {
             rocket.setOnClickListener(this);
+
+            ((ImageView)rocket).getDrawable().setLevel(1);
         }
 
-        updateRocket(mActiveRocket);
+        updateRockets(mActiveRocket);
     }
 
 
     @Override
     public void onClick(View v) {
         if(mRockets.contains(v)) {
-            updateRocket(v);
+            setRocketActive(v);
+            updateRockets(v);
             int rocketId = mRockets.indexOf(v);
             ((NanoSenseActivity) getActivity()).contentViewResolver(rocketId);
         }
@@ -79,20 +81,28 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
     }
 
 
-    void updateRocket(View v) {
-        mActiveRocket = v;
 
-        setRocketActivation(v,true);
+
+    private void updateRockets(View v) {
+        setRocketActivateState(v, true);
 
         for(View rocket : mRockets) {
             if(rocket != mActiveRocket) {
-                setRocketActivation(rocket,false);
+                setRocketActivateState(rocket, false);
             }
         }
     }
 
 
-    void setRocketActivation(View v, boolean activated) {
+    private void setRocketActive(View v) {
+        if(mRockets.contains(v)) {
+            mActiveRocket = v;
+        }
+
+    }
+
+
+    private void setRocketActivateState(View v, boolean activated) {
         ImageView rocket = (ImageView) v;
         if(rocket != null) {
             if(activated) {

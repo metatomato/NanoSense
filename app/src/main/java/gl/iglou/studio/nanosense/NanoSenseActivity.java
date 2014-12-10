@@ -1,6 +1,5 @@
 package gl.iglou.studio.nanosense;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Fragment;
@@ -8,14 +7,13 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.TextView;
+
+import gl.iglou.studio.nanosense.BT.BTFragment;
+import gl.iglou.studio.nanosense.BT.BTGUIFragment;
 
 
 public class NanoSenseActivity extends ActionBarActivity {
@@ -34,13 +32,14 @@ public class NanoSenseActivity extends ActionBarActivity {
     private View mContentView;
     private DrawerLayout mDrawerLayout;
 
+    private BTFragment mBTFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nano_sense);
 
-
+        //Layout Views Setup
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mContentView = findViewById(R.id.main_content);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -92,6 +91,14 @@ public class NanoSenseActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
+
+        //Start BTFragment
+        FragmentManager fm = getFragmentManager();
+        if(mBTFragment == null) {
+            mBTFragment = new BTFragment();
+            fm.beginTransaction().add(mBTFragment, "BTFrag").commit();
+        }
+
         contentViewResolver(MP_FRAGMENT);
     }
 
@@ -104,7 +111,7 @@ public class NanoSenseActivity extends ActionBarActivity {
                 main_content_fragment = new MPFragment();
                 break;
             case BT_FRAGMENT:
-                main_content_fragment = new BTFragment();
+                main_content_fragment = new BTGUIFragment();
                 break;
             default:
                 main_content_fragment = new MPFragment();
@@ -138,5 +145,9 @@ public class NanoSenseActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public BTFragment getBTController() {
+        return mBTFragment;
     }
 }
