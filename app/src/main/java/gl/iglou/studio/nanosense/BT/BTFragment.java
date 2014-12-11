@@ -44,7 +44,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
     // Intent request codes
     public static final int REQUEST_CONNECT_DEVICE = 1;
-    private static final int REQUEST_ENABLE_BT = 3;
+    private static final int REQUEST_ENABLE_BT = 2;
+    private static final int REQUEST_ENABLE_DISCOVERY = 3;
 
     // Layout Views
     private ListView mConversationView;
@@ -123,6 +124,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                             .show();
                     getActivity().finish();
                 }
+            case REQUEST_ENABLE_DISCOVERY:
+
         }
     }
 
@@ -147,11 +150,50 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         mBTService.connect(device);
     }
 
+    //BTGUIInterface implementation
     public void onScanClick() {
         Log.d(TAG,"Scan for BT devices!");
         Intent serverIntent = new Intent(getActivity(),BTDeviceListActivity.class);
         startActivityForResult(serverIntent, BTFragment.REQUEST_CONNECT_DEVICE);
     }
+
+
+    public String[] getDeviceList() {
+        String[] array = {""};
+        return array;
+    }
+
+    public boolean isBTEnabled(){
+        return mBluetoothAdapter.isEnabled();
+    }
+
+
+    public void setBTActivated(boolean state) {
+        if (state && !isBTEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else if(!state && isBTEnabled()) {
+            mBluetoothAdapter.disable();
+        }
+    }
+
+    public boolean isDiscoverable() {
+        return true;
+    }
+
+    public void setDiscoverable() {
+        if (mBluetoothAdapter.getScanMode() !=
+                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivityForResult(discoverableIntent, );
+        } else {
+            Toast.makeText(getActivity().getApplicationContext(), " Device is already Discoverable! "
+                , Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {

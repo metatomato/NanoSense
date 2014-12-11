@@ -8,4 +8,6 @@
     <dimen name="navigation_drawer_width">200dp</dimen>
     <dimen name="content_drawer_offset">80dp</dimen>
     <dimen name="launcher_icon">56dp</dimen>
+    <dimen name="diameter">120dp</dimen>
+
 </resources>

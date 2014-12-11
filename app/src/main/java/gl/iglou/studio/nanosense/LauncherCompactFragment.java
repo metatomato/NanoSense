@@ -19,8 +19,8 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
     private static final String TAG = "LauncherCompactFragment";
     private ArrayList<View> mRockets;
     private View mActiveRocket;
-    private static final int ROCKET_TINT = R.color.black_alpha;
-    private static final int ROCKET_BACKGROUND = R.color.black_alpha_light;
+    private static final int ROCKET_TINT_ACTIVE = R.color.color_tertiary;
+    private static final int ROCKET_TINT_PASSIVE = R.color.black_alpha;
     private LauncherCompactCallbacks mCallbacks;
 
     public LauncherCompactFragment() {
@@ -106,10 +106,10 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
         ImageView rocket = (ImageView) v;
         if(rocket != null) {
             if(activated) {
-                rocket.getDrawable().setTint(Color.BLACK);
+                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_ACTIVE));
                 rocket.setBackground(getResources().getDrawable(R.drawable.round_rect));
             } else {
-                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT));
+                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_PASSIVE));
                 rocket.setBackgroundColor(getResources().getColor(R.color.white_solid));
             }
         }

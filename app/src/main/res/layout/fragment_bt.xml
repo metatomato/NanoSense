@@ -4,29 +4,18 @@
     android:layout_height="match_parent"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:gravity="center">
+    android:background="?android:selectableItemBackground">
 
     <TextView
         android:id="@+id/label_section_bt_adapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:text="BLUETOOTH ADAPTER"
-        android:background="@color/color_primary"
+        android:background="@color/color_secondary"
         android:textColor="@color/white_solid"
         android:textSize="20dp"
-        android:paddingLeft="5dp" />
-
-    <Button
-        android:id="@+id/btn_device_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CONNECT"
-        android:textSize="30dp"
-        android:layout_marginBottom="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="false"
-        android:layout_centerHorizontal="true" />
+        android:paddingLeft="5dp"
+        android:elevation="8dp" />
 
     <Switch
         android:layout_width="wrap_content"
@@ -72,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="BLUETOOTH REMOTE"
-        android:background="@color/color_primary"
+        android:background="@color/color_secondary"
         android:textColor="@color/white_solid"
         android:layout_below="@+id/switch_discover_io"
         android:layout_alignParentStart="true"
@@ -151,5 +140,23 @@
         android:id="@+id/label_current_uuid"
         android:layout_alignTop="@+id/label_uuid"
         android:layout_alignStart="@+id/label_current_state" />
+
+    <Button
+        android:id="@+id/btn_device_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CONNECT"
+        android:textSize="20dp"
+        android:layout_below="@+id/label_current_uuid"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="15dp"
+        android:background="@drawable/circle"
+        android:textColor="@color/white_solid"
+        android:stateListAnimator="@animator/button_elevation"
+        android:elevation="2dp"/>
 
 </RelativeLayout>

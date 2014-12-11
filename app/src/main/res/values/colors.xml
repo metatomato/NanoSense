@@ -4,8 +4,10 @@
     <item name="green_solid" type="color">#00ff00</item>
     <item name="black_alpha" type="color">#80000000</item>
     <item name="black_alpha_light" type="color">#18000000</item>
-    <item name="color_primary" type="color">#ff9800</item>
-    <item name="color_primary_dark" type="color">#f57c00</item>
-    <item name="color_secondary" type="color">#8bc34a</item>
+    <item name="color_primary" type="color">#7cbf4c</item>
+    <item name="color_primary_dark" type="color">#289752</item>
+    <item name="color_secondary" type="color">#01a2d6</item>
+    <item name="color_tertiary" type="color">#f8b13c</item>
+
 
 </resources>
