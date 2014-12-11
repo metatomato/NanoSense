@@ -1,16 +1,12 @@
 package gl.iglou.studio.nanosense.BT;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
@@ -30,7 +26,7 @@ public class BTGUIFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_bt, container, false);
-        TextView text = (TextView)rootView.findViewById(R.id.section_label);
+        TextView text = (TextView)rootView.findViewById(R.id.label_section_bt_adapter);
         text.setText(mTextContent);
         return rootView;
     }

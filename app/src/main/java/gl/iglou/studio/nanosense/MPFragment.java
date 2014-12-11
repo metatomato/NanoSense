@@ -1,6 +1,5 @@
 package gl.iglou.studio.nanosense;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,7 +21,7 @@ public class MPFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_mp, container, false);
-        TextView text = (TextView)rootView.findViewById(R.id.section_label);
+        TextView text = (TextView)rootView.findViewById(R.id.label_section_bt_adapter);
         text.setText(mTextContent);
         return rootView;
     }
