@@ -1,12 +1,11 @@
 package gl.iglou.studio.nanosense.BT;
 
 import android.app.Fragment;
-import android.graphics.Outline;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
@@ -26,23 +24,24 @@ import gl.iglou.studio.nanosense.R;
 /**
  * Created by metatomato on 08.12.14.
  */
-public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelectedListener,
-        CompoundButton.OnCheckedChangeListener {
+public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
 
     private boolean D = true;
 
     private final String SCAN_MSG = "Scan for devices...";
 
     private String mTextContent = "BT";
-
-    private Button mDeviceListButton;
-
-    ArrayList<String> mDeviceSlectionList;
+    ArrayList<String> mDeviceSelectionList;
 
     private BTControlCallback mCallback;
 
+    private Button mDeviceListButton;
     private Switch mSwitchAdapter;
     private Switch mSwitchDiscover;
+    private TextView mLabelConenctionState;
+    private TextView mLabelAddress;
+    private Spinner mSpinnerUuids;
+    private Spinner mSpinnerRemotes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,20 +50,18 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
         TextView text = (TextView)rootView.findViewById(R.id.label_section_bt_adapter);
         text.setText(mTextContent);
 
-        ((Spinner)rootView.findViewById(R.id.spinner_remote)).setOnItemSelectedListener(this);
-/*
-        View connectButton = rootView.findViewById(R.id.btn_device_list);
+        mSwitchAdapter = (Switch) rootView.findViewById(R.id.switch_adapter_io);
 
-        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                int size = getResources().getDimensionPixelSize(R.dimen.diameter);
-                outline.setOval(0, 0, size, size);
-            }
-        };
-        connectButton.setOutlineProvider(viewOutlineProvider);
-        //connectButton.setClipToOutline(true);
-*/
+        mSwitchDiscover = (Switch) rootView.findViewById(R.id.switch_discover_io);
+
+        mSpinnerRemotes = ((Spinner)rootView.findViewById(R.id.spinner_remote));
+
+        mSpinnerUuids = ((Spinner)rootView.findViewById(R.id.spinner_uuids));
+
+        mLabelAddress = (TextView)rootView.findViewById(R.id.label_current_address);
+
+        mLabelConenctionState = (TextView)rootView.findViewById(R.id.label_current_state);
+
         return rootView;
     }
 
@@ -83,43 +80,67 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
             }
         });
 
-        setSpinner( getView().findViewById(R.id.spinner_remote) );
+        setRemoteSpinner();
 
-        mSwitchAdapter = (Switch) getView().findViewById(R.id.switch_adapter_io);
         mSwitchAdapter.setOnCheckedChangeListener(this);
-        mSwitchDiscover = (Switch) getView().findViewById(R.id.switch_discover_io);
+
+
         mSwitchDiscover.setOnCheckedChangeListener(this);
+
+        mSpinnerRemotes.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                String selected = (String) parent.getItemAtPosition(pos);
+                if(selected.contentEquals(SCAN_MSG)) {
+                    mCallback.onScanClick();
+                } else {
+                    updateRemote();
+                }
+                if(D) {
+                    Toast.makeText(getActivity().getApplicationContext(), selected + " remote selected",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        mSpinnerUuids.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                String selected = (String) parent.getItemAtPosition(pos);
+                if(selected.contentEquals(SCAN_MSG)) {
+                    mCallback.onScanClick();
+                }
+                if(D) {
+                    Toast.makeText(getActivity().getApplicationContext(), selected + " remote selected",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
 
-    private void setSpinner(View v) {
-        Spinner spinner = (Spinner) v;
+    private void setRemoteSpinner() {
         updateDeviceList();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item, mDeviceSlectionList );
+                android.R.layout.simple_spinner_item, mDeviceSelectionList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        mSpinnerRemotes.setAdapter(adapter);
     }
 
 
     private void updateDeviceList() {
-        mDeviceSlectionList = new ArrayList<>( Arrays.asList(mCallback.getDeviceList()) );
-        if(mDeviceSlectionList.get(0) == "") {
-            mDeviceSlectionList.clear();
-            mDeviceSlectionList.add("- Select a remote to connect -");
+        mDeviceSelectionList = new ArrayList<>( Arrays.asList(mCallback.getDeviceList()) );
+        if(mDeviceSelectionList.get(0) == "") {
+            mDeviceSelectionList.clear();
+            mDeviceSelectionList.add("- Select a remote to connect -");
         }
-        mDeviceSlectionList.add(SCAN_MSG);
-    }
-
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-        String selected = (String) parent.getItemAtPosition(pos);
-        if(selected.contentEquals(SCAN_MSG)) {
-            mCallback.onScanClick();
-        }
-        if(D)
-        Toast.makeText(getActivity().getApplicationContext(),  selected + " remote selected",
-                Toast.LENGTH_SHORT).show();
+        mDeviceSelectionList.add(SCAN_MSG);
     }
 
 
@@ -150,9 +171,7 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
     }
 
 
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-    }
+
 
 
     public void setDiscoverySwitch(boolean state) {
@@ -164,8 +183,35 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
     }
 
 
+    public void updateRemote() {
+        mLabelAddress.setText( mCallback.getAddress() );
+        setConnectionState(mCallback.getConnectionState());
+        setRemoteSpinner();
+    }
+
+    public void setConnectionState(int state) {
+        String stateLabel = "NONE";
+        switch(state) {
+            case BTService.STATE_NONE:
+                stateLabel = "DISCONNECTED";
+                mLabelConenctionState.setTextColor(Color.RED);
+                break;
+            case BTService.STATE_CONNECTING:
+                stateLabel = "CONNECTING";
+                mLabelConenctionState.setTextColor(Color.LTGRAY);
+                break;
+            case BTService.STATE_CONNECTED:
+                stateLabel = "CONNECTED";
+                mLabelConenctionState.setTextColor(Color.GREEN);
+                break;
+        }
+        mLabelConenctionState.setText(stateLabel);
+    }
+
+
     public interface BTControlCallback {
 
+        //Adapter Callbacks
         public void onScanClick();
 
         public String[] getDeviceList();
@@ -178,5 +224,19 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
 
         public void setDiscoverable();
 
+
+        //Remote Callbacks
+
+        public void setCurrentDevice(String deviceName);
+
+        public int getConnectionState();
+
+        public String getName();
+
+        public String getAddress();
+
+        public String[] getUUID();
+
+        public void onUuidSelected(String uuid);
     }
 }

@@ -157,8 +157,8 @@ public class BTDeviceListActivity extends Activity {
             Log.d(TAG,"Device selected " + address);
 
             // Set result and finish this Activity
-            //setResult(Activity.RESULT_OK, intent);
-            //finish();
+            setResult(Activity.RESULT_OK, intent);
+            finish();
         }
     };
 

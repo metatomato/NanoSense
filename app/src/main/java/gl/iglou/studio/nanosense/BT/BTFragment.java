@@ -8,20 +8,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import gl.iglou.studio.nanosense.R;
 
@@ -50,25 +48,27 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_ENABLE_DISCOVERY = 3;
 
-    private static final int BT_DISCOVERABLE_DURATION = 5;
+    private static final int BT_DISCOVERABLE_DURATION = 30;
 
     // Layout Views
     private ListView mConversationView;
     private EditText mOutEditText;
     private Button mSendButton;
 
-    // Name of the connected device
-    private String mConnectedDeviceName = null;
-    // Array adapter for the conversation thread
-    private ArrayAdapter<String> mConversationArrayAdapter;
-    // String buffer for outgoing messages
-    private StringBuffer mOutStringBuffer;
+    // Connected device
+    private BluetoothDevice mConnectedDevice = null;
+    // Connection state of the current device
+    private int mConnectionState = BTService.STATE_NONE;
+    // Current UUID
+    private String mSelectedUuid;
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
-    // Member object for the chat services
+    // Member object for the BTservices
     private BTService mBTService = null;
-
+    // Member object for the BTGUIFragment
     private BTGUIFragment mBTGUIFrag = null;
+
+    private ArrayList<String> mPreferedDevices;
 
     public BTFragment() {
     }
@@ -78,6 +78,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(D) Log.e(TAG, "+++ ON CREATE +++");
+
+        mPreferedDevices = new ArrayList<>();
 
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -101,6 +103,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         super.onStart();
         if(D) Log.e(TAG, "++ ON START ++");
 
+        fetchDevicesFromSharedData();
+
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled()) {
@@ -119,10 +123,13 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             case REQUEST_CONNECT_DEVICE:
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d(TAG,"Connect to device " + data.getExtras()
-                            .getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS));
+                    String address = data.getExtras().getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    mConnectedDevice = mBluetoothAdapter.getRemoteDevice(address);
+                    Log.d(TAG,"Device " + mConnectedDevice.getName() + " address " + mConnectedDevice.getAddress());
                     Toast.makeText(getActivity(), "Found a device to connect!!", Toast.LENGTH_SHORT)
                             .show();
+                    addDeviceToPreferedList(mConnectedDevice.getName());
+                    updateBTGUIRemote();
                 }
                 break;
             case REQUEST_ENABLE_BT:
@@ -147,6 +154,32 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     }
 
 
+    private void fetchDevicesFromSharedData() {
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        String device = sharedPref.getString(getString(R.string.saved_devices), "");
+        if(!device.contentEquals(""))
+            mPreferedDevices.add(device);
+    }
+
+    private void saveDeviceToSharedData(String deviceName) {
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.saved_devices), deviceName);
+        editor.commit();
+    }
+
+    private void addDeviceToPreferedList(String name) {
+        if(!mPreferedDevices.contains(name)) {
+            mPreferedDevices.add(name);
+            saveDeviceToSharedData(name);
+        }
+    }
+
     public void setBTGUIFrag(BTGUIFragment frag) {
         if(frag != null) {
             mBTGUIFrag = frag;
@@ -158,9 +191,10 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         mBTService = new BTService(getActivity(), mHandler);
+    }
 
-        // Initialize the buffer for outgoing messages
-        mOutStringBuffer = new StringBuffer("");
+    public void updateBTGUIRemote() {
+        mBTGUIFrag.updateRemote();
     }
 
     private void connectDevice(Intent data) {
@@ -182,8 +216,10 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
 
     public String[] getDeviceList() {
-        String[] array = {""};
-        return array;
+        String[] devices = {""};
+        if(!mPreferedDevices.isEmpty())
+            devices = mPreferedDevices.toArray(new String[mPreferedDevices.size()]);
+        return devices;
     }
 
     public boolean isBTEnabled(){
@@ -223,7 +259,41 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     }
 
+    //Remote Callbacks
+    public int getConnectionState() {
+        return mConnectionState;
+    }
 
+    public String getName() {
+        String name = "";
+        if(mConnectedDevice != null) {
+            name = mConnectedDevice.getName();
+        }
+        return name;
+    }
+
+    public String getAddress(){
+        String address = "";
+        if(mConnectedDevice != null)
+            address = mConnectedDevice.getAddress();
+        return address;
+    }
+
+    public String[] getUUID() {
+        ArrayList<String> uuid = new ArrayList<>();
+        if(mConnectedDevice != null) {
+            Parcelable[] uuids = mConnectedDevice.getUuids();
+            for(Parcelable id : uuids) {
+                uuid.add(id.toString());
+            }
+        }
+        return uuid.toArray(new String[uuid.size()]);
+    }
+
+
+    public void onUuidSelected(String uuid) {
+        mSelectedUuid = uuid;
+    }
 
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {
