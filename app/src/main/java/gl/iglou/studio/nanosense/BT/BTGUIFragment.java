@@ -41,6 +41,9 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
 
     private BTControlCallback mCallback;
 
+    private Switch mSwitchAdapter;
+    private Switch mSwitchDiscover;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,10 +85,10 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
 
         setSpinner( getView().findViewById(R.id.spinner_remote) );
 
-        Switch toggle = (Switch) getView().findViewById(R.id.switch_adapter_io);
-        toggle.setOnCheckedChangeListener(this);
-        toggle = (Switch) getView().findViewById(R.id.switch_discover_io);
-        toggle.setOnCheckedChangeListener(this);
+        mSwitchAdapter = (Switch) getView().findViewById(R.id.switch_adapter_io);
+        mSwitchAdapter.setOnCheckedChangeListener(this);
+        mSwitchDiscover = (Switch) getView().findViewById(R.id.switch_discover_io);
+        mSwitchDiscover.setOnCheckedChangeListener(this);
     }
 
 
@@ -139,6 +142,9 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
                     mCallback.setBTActivated(false);
                     break;
                 case R.id.switch_discover_io:
+                    if(mCallback.isDiscoverable()) {
+                        mSwitchDiscover.setChecked(true);
+                    }
             }
         }
     }
@@ -146,6 +152,15 @@ public class BTGUIFragment extends Fragment implements AdapterView.OnItemSelecte
 
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
+    }
+
+
+    public void setDiscoverySwitch(boolean state) {
+        mSwitchDiscover.setChecked(state);
+    }
+
+    public void setAdapterSwitch(boolean state) {
+        mSwitchAdapter.setChecked(state);
     }
 
 

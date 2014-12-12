@@ -84,10 +84,6 @@ public class BTDeviceListActivity extends Activity {
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
 
-        //Register the Broadcasts when finding new UUID
-        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
-        this.registerReceiver(mReceiver, filter);
-
         // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -161,8 +157,8 @@ public class BTDeviceListActivity extends Activity {
             Log.d(TAG,"Device selected " + address);
 
             // Set result and finish this Activity
-            setResult(Activity.RESULT_OK, intent);
-            finish();
+            //setResult(Activity.RESULT_OK, intent);
+            //finish();
         }
     };
 
@@ -188,12 +184,6 @@ public class BTDeviceListActivity extends Activity {
                 if (mNewDevicesArrayAdapter.getCount() == 0) {
                     String noDevices = getResources().getText(R.string.none_found).toString();
                     mNewDevicesArrayAdapter.add(noDevices);
-                }
-            } else if (BluetoothDevice.ACTION_UUID.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
-                for (int i=0; i<uuidExtra.length; i++) {
-                    Log.d(TAG,"\n  Device: " + device.getName() + ", " + device + ", Service: " + uuidExtra[i].toString());
                 }
             }
         }

@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +50,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_ENABLE_DISCOVERY = 3;
 
+    private static final int BT_DISCOVERABLE_DURATION = 5;
+
     // Layout Views
     private ListView mConversationView;
     private EditText mOutEditText;
@@ -62,6 +67,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
     private BTService mBTService = null;
+
+    private BTGUIFragment mBTGUIFrag = null;
 
     public BTFragment() {
     }
@@ -81,6 +88,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             getActivity().finish();
             return;
         }
+
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+        getActivity().registerReceiver(mReceiver, filter);
+        filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
+        getActivity().registerReceiver(mReceiver, filter);
     }
 
 
@@ -105,11 +117,12 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_CONNECT_DEVICE:
-                Log.d(TAG,"Connect to device " + data.getExtras()
-                        .getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS));
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
-                    connectDevice(data);
+                    Log.d(TAG,"Connect to device " + data.getExtras()
+                            .getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS));
+                    Toast.makeText(getActivity(), "Found a device to connect!!", Toast.LENGTH_SHORT)
+                            .show();
                 }
                 break;
             case REQUEST_ENABLE_BT:
@@ -120,15 +133,25 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(getActivity(), R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT)
-                            .show();
-                    getActivity().finish();
+                    mBTGUIFrag.setAdapterSwitch(false);
                 }
+                break;
             case REQUEST_ENABLE_DISCOVERY:
-
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(getActivity(), "device discoverable!", Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    mBTGUIFrag.setDiscoverySwitch(false);
+                }
         }
     }
 
+
+    public void setBTGUIFrag(BTGUIFragment frag) {
+        if(frag != null) {
+            mBTGUIFrag = frag;
+        }
+    }
 
     private void setupBTService() {
         Log.d(TAG, "setupBTService()");
@@ -178,15 +201,22 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     }
 
     public boolean isDiscoverable() {
-        return true;
+        return getScanMode() == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE;
     }
 
+
+    public int getScanMode() {
+        return mBluetoothAdapter.getScanMode();
+    }
+
+
     public void setDiscoverable() {
+        Log.d(TAG,"ScanMode: "+ String.valueOf(getScanMode()));
         if (mBluetoothAdapter.getScanMode() !=
                 BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivityForResult(discoverableIntent, );
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, BT_DISCOVERABLE_DURATION);
+            startActivityForResult(discoverableIntent, REQUEST_ENABLE_DISCOVERY);
         } else {
             Toast.makeText(getActivity().getApplicationContext(), " Device is already Discoverable! "
                 , Toast.LENGTH_SHORT).show();
@@ -228,6 +258,43 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     Toast.makeText(getActivity().getApplicationContext(), msg.getData().getString(TOAST),
                             Toast.LENGTH_SHORT).show();
                     Log.d(TAG,"MESSAGE_TOAST");
+                    break;
+            }
+        }
+    };
+
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch(action) {
+                case BluetoothAdapter.ACTION_SCAN_MODE_CHANGED:
+                    if (mBTGUIFrag != null) {
+                        int scanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, 0);
+                        switch (scanMode) {
+                            case BluetoothAdapter.SCAN_MODE_NONE:
+                                Log.d(TAG, "SCAN_MODE_NONE");
+                                mBTGUIFrag.setDiscoverySwitch(false);
+                                break;
+                            case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+                                Log.d(TAG, "SCAN_MODE_CONNECTABLE");
+                                mBTGUIFrag.setDiscoverySwitch(false);
+                                break;
+                            case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+                                Log.d(TAG, "SCAN_MODE_CONNECTABLE_DISCOVERABLE");
+                        }
+                    }
+                    break;
+                case BluetoothDevice.ACTION_UUID:
+                    Log.d(TAG, "Get an UUID_ACTION!!");
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
+                    if(uuidExtra != null) {
+                        for (int i = 0; i < uuidExtra.length; i++) {
+                            Log.d(TAG, "\n  Device: " + device.getName() + ", " + device + ", Service: " + uuidExtra[i].toString());
+                        }
+                    }
                     break;
             }
         }

@@ -109,12 +109,15 @@ public class NanoSenseActivity extends ActionBarActivity {
         switch(fragmentId) {
             case MP_FRAGMENT :
                 main_content_fragment = new MPFragment();
+                mBTFragment.setBTGUIFrag(null);
                 break;
             case BT_FRAGMENT:
                 main_content_fragment = new BTGUIFragment();
+                mBTFragment.setBTGUIFrag((BTGUIFragment)main_content_fragment);
                 break;
             default:
                 main_content_fragment = new MPFragment();
+                mBTFragment.setBTGUIFrag(null);
         }
 
         fragmentManager.beginTransaction()
