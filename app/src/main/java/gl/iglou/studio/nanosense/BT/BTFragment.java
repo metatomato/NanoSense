@@ -2,13 +2,13 @@ package gl.iglou.studio.nanosense.BT;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,8 +20,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
-import gl.iglou.studio.nanosense.R;
+import java.util.Arrays;
 
 /**
  * Created by metatomato on 07.12.14.
@@ -32,7 +31,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private static final String TAG = "BTFragment";
     private static final boolean D = true;
 
-    // Message types sent from the BluetoothChatService Handler
+    // Message types sent from the BTService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_READ = 2;
     public static final int MESSAGE_WRITE = 3;
@@ -56,7 +55,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private Button mSendButton;
 
     // Connected device
-    private BluetoothDevice mConnectedDevice = null;
+    private BluetoothDevice mCurrentRemote = null;
     // Connection state of the current device
     private int mConnectionState = BTService.STATE_NONE;
     // Current UUID
@@ -67,8 +66,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private BTService mBTService = null;
     // Member object for the BTGUIFragment
     private BTGUIFragment mBTGUIFrag = null;
-
-    private ArrayList<String> mPreferedDevices;
+    // Member object for the BTDeviceManager
+    private BTDeviceManager mDeviceManager = null;
 
     public BTFragment() {
     }
@@ -79,8 +78,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         super.onCreate(savedInstanceState);
         if(D) Log.e(TAG, "+++ ON CREATE +++");
 
-        mPreferedDevices = new ArrayList<>();
-
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -89,6 +86,12 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             Toast.makeText(getActivity(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
             getActivity().finish();
             return;
+        }
+
+        FragmentManager fm = getFragmentManager();
+        if(mDeviceManager == null) {
+            mDeviceManager = new BTDeviceManager();
+            fm.beginTransaction().add(mDeviceManager, "BTDeviceManager").commit();
         }
 
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
@@ -103,8 +106,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         super.onStart();
         if(D) Log.e(TAG, "++ ON START ++");
 
-        fetchDevicesFromSharedData();
-
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled()) {
@@ -114,6 +115,20 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         } else {
             if (mBTService == null) setupBTService();
         }
+
+        initCurrentRemote();
+    }
+
+
+    private void initCurrentRemote() {
+        String lastAddress = mDeviceManager.getLastRemote();
+        if(lastAddress == null) {
+            lastAddress = mDeviceManager.getDefaultRemote();
+            Log.d(TAG,"No LastRemote found! Goes with default!");
+        }
+        if(lastAddress!=null) mCurrentRemote = mBluetoothAdapter.getRemoteDevice(lastAddress);
+
+        Log.d(TAG,"Init remote with " + mCurrentRemote.getName());
     }
 
 
@@ -124,12 +139,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras().getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    mConnectedDevice = mBluetoothAdapter.getRemoteDevice(address);
-                    Log.d(TAG,"Device " + mConnectedDevice.getName() + " address " + mConnectedDevice.getAddress());
-                    Toast.makeText(getActivity(), "Found a device to connect!!", Toast.LENGTH_SHORT)
-                            .show();
-                    addDeviceToPreferedList(mConnectedDevice.getName());
+                    mCurrentRemote = mBluetoothAdapter.getRemoteDevice(address);
+                    mDeviceManager.addAddressToPrefered(address);
                     updateBTGUIRemote();
+                } else {
+                    mBTGUIFrag.setRemoteSpinnerSelection(getName());
                 }
                 break;
             case REQUEST_ENABLE_BT:
@@ -153,32 +167,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     }
 
-
-    private void fetchDevicesFromSharedData() {
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-        String device = sharedPref.getString(getString(R.string.saved_devices), "");
-        if(!device.contentEquals(""))
-            mPreferedDevices.add(device);
-    }
-
-    private void saveDeviceToSharedData(String deviceName) {
-
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_devices), deviceName);
-        editor.commit();
-    }
-
-    private void addDeviceToPreferedList(String name) {
-        if(!mPreferedDevices.contains(name)) {
-            mPreferedDevices.add(name);
-            saveDeviceToSharedData(name);
-        }
-    }
 
     public void setBTGUIFrag(BTGUIFragment frag) {
         if(frag != null) {
@@ -216,10 +204,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
 
     public String[] getDeviceList() {
-        String[] devices = {""};
-        if(!mPreferedDevices.isEmpty())
-            devices = mPreferedDevices.toArray(new String[mPreferedDevices.size()]);
-        return devices;
+        return mDeviceManager.getNames();
     }
 
     public boolean isBTEnabled(){
@@ -260,29 +245,36 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     }
 
     //Remote Callbacks
+
+    public void setCurrentDevice(String name) {
+        String address = mDeviceManager.getAddress(name);
+        if(address != null)
+            mCurrentRemote = mBluetoothAdapter.getRemoteDevice(address);
+    }
+
     public int getConnectionState() {
         return mConnectionState;
     }
 
     public String getName() {
-        String name = "";
-        if(mConnectedDevice != null) {
-            name = mConnectedDevice.getName();
+        String name = null;
+        if(mCurrentRemote != null) {
+            name = mCurrentRemote.getName();
         }
         return name;
     }
 
     public String getAddress(){
         String address = "";
-        if(mConnectedDevice != null)
-            address = mConnectedDevice.getAddress();
+        if(mCurrentRemote != null)
+            address = mCurrentRemote.getAddress();
         return address;
     }
 
     public String[] getUUID() {
         ArrayList<String> uuid = new ArrayList<>();
-        if(mConnectedDevice != null) {
-            Parcelable[] uuids = mConnectedDevice.getUuids();
+        if(mCurrentRemote != null) {
+            Parcelable[] uuids = mCurrentRemote.getUuids();
             for(Parcelable id : uuids) {
                 uuid.add(id.toString());
             }
@@ -295,6 +287,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         mSelectedUuid = uuid;
     }
 
+
     // The Handler that gets information back from the BluetoothChatService
     private final Handler mHandler = new Handler() {
         @Override
@@ -304,6 +297,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BTService.STATE_CONNECTED:
+                            mDeviceManager.saveLastRemoteToSharedData(mCurrentRemote.getAddress());
                             Log.d(TAG,"STATE_CONNECTED");
                             break;
                         case BTService.STATE_CONNECTING:
@@ -332,6 +326,12 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             }
         }
     };
+
+
+    public void onConnectClick() {
+        getUUID();
+        mDeviceManager.saveLastRemoteToSharedData(mCurrentRemote.getAddress());
+    }
 
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

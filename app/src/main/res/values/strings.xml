@@ -6,6 +6,7 @@
     <!-- Shared Preferences-->
     <string name="preference_file_key">persistent_devices</string>
     <string name="saved_devices">saved_devices</string>
+    <string name="last_remote">last_remote</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

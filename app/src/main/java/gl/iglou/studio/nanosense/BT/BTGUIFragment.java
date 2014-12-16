@@ -32,6 +32,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
     private String mTextContent = "BT";
     ArrayList<String> mDeviceSelectionList;
+    ArrayList<String> mUuidSelectionList;
 
     private BTControlCallback mCallback;
 
@@ -76,7 +77,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
         mDeviceListButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.onScanClick();
+                mCallback.onConnectClick();
             }
         });
 
@@ -94,11 +95,8 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
                 if(selected.contentEquals(SCAN_MSG)) {
                     mCallback.onScanClick();
                 } else {
+                    mCallback.setCurrentDevice(selected);
                     updateRemote();
-                }
-                if(D) {
-                    Toast.makeText(getActivity().getApplicationContext(), selected + " remote selected",
-                            Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -110,13 +108,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selected = (String) parent.getItemAtPosition(pos);
-                if(selected.contentEquals(SCAN_MSG)) {
-                    mCallback.onScanClick();
-                }
-                if(D) {
-                    Toast.makeText(getActivity().getApplicationContext(), selected + " remote selected",
-                            Toast.LENGTH_SHORT).show();
-                }
+                mCallback.onUuidSelected(selected);
             }
 
             @Override
@@ -124,7 +116,15 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        if(mCallback != null)
+            setRemoteSpinnerSelection(mCallback.getName());
+    }
+
+    //RemoteSpinner interface
     private void setRemoteSpinner() {
         updateDeviceList();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
@@ -134,6 +134,11 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
 
+    public void setRemoteSpinnerSelection(String name) {
+        if(name != null && mDeviceSelectionList.contains(name))
+            mSpinnerRemotes.setSelection(mDeviceSelectionList.indexOf(name));
+    }
+
     private void updateDeviceList() {
         mDeviceSelectionList = new ArrayList<>( Arrays.asList(mCallback.getDeviceList()) );
         if(mDeviceSelectionList.get(0) == "") {
@@ -141,6 +146,16 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
             mDeviceSelectionList.add("- Select a remote to connect -");
         }
         mDeviceSelectionList.add(SCAN_MSG);
+    }
+
+//UUIDSpinner interface
+    private void setUuidSpinner() {
+        mUuidSelectionList = new ArrayList<>( Arrays.asList(mCallback.getUUID()) );
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_item, mUuidSelectionList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerUuids.setAdapter(adapter);
+        mSpinnerUuids.setSelection( mUuidSelectionList.size() - 1 );
     }
 
 
@@ -186,7 +201,8 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     public void updateRemote() {
         mLabelAddress.setText( mCallback.getAddress() );
         setConnectionState(mCallback.getConnectionState());
-        setRemoteSpinner();
+        setRemoteSpinnerSelection(mCallback.getName());
+        setUuidSpinner();
     }
 
     public void setConnectionState(int state) {
@@ -227,7 +243,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         //Remote Callbacks
 
-        public void setCurrentDevice(String deviceName);
+        public void setCurrentDevice(String name);
 
         public int getConnectionState();
 
@@ -238,5 +254,8 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
         public String[] getUUID();
 
         public void onUuidSelected(String uuid);
+
+
+        public void onConnectClick();
     }
 }
