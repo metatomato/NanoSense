@@ -14,6 +14,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -21,6 +23,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import gl.iglou.studio.nanosense.R;
 
 /**
  * Created by metatomato on 07.12.14.
@@ -54,12 +59,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private EditText mOutEditText;
     private Button mSendButton;
 
-    // Connected device
-    private BluetoothDevice mCurrentRemote = null;
-    // Connection state of the current device
-    private int mConnectionState = BTService.STATE_NONE;
-    // Current UUID
-    private String mSelectedUuid;
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the BTservices
@@ -76,6 +75,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if(D) Log.e(TAG, "+++ ON CREATE +++");
 
         // Get local Bluetooth adapter
@@ -98,6 +98,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         getActivity().registerReceiver(mReceiver, filter);
         filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
         getActivity().registerReceiver(mReceiver, filter);
+
     }
 
 
@@ -115,20 +116,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         } else {
             if (mBTService == null) setupBTService();
         }
-
-        initCurrentRemote();
-    }
-
-
-    private void initCurrentRemote() {
-        String lastAddress = mDeviceManager.getLastRemote();
-        if(lastAddress == null) {
-            lastAddress = mDeviceManager.getDefaultRemote();
-            Log.d(TAG,"No LastRemote found! Goes with default!");
-        }
-        if(lastAddress!=null) mCurrentRemote = mBluetoothAdapter.getRemoteDevice(lastAddress);
-
-        Log.d(TAG,"Init remote with " + mCurrentRemote.getName());
     }
 
 
@@ -139,11 +126,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras().getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    mCurrentRemote = mBluetoothAdapter.getRemoteDevice(address);
-                    mDeviceManager.addAddressToPrefered(address);
+                    mDeviceManager.addAddressToSession(address);
+                    mDeviceManager.setCurrentDevice(address);
                     updateBTGUIRemote();
                 } else {
-                    mBTGUIFrag.setRemoteSpinnerSelection(getName());
+                    mBTGUIFrag.setRemoteSpinnerSelection(getPosition());
                 }
                 break;
             case REQUEST_ENABLE_BT:
@@ -177,22 +164,26 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private void setupBTService() {
         Log.d(TAG, "setupBTService()");
 
-        // Initialize the BluetoothChatService to perform bluetooth connections
+        // Initialize the BTService to perform bluetooth connections
         mBTService = new BTService(getActivity(), mHandler);
     }
 
+
     public void updateBTGUIRemote() {
-        mBTGUIFrag.updateRemote();
+        mBTGUIFrag.updateRemote(true);
     }
 
-    private void connectDevice(Intent data) {
-        // Get the device MAC address
-        String address = data.getExtras()
-                .getString(BTDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        mBTService.connect(device);
+
+    private void connectDevice() {
+        BluetoothDevice remote = mBluetoothAdapter.
+                getRemoteDevice(mDeviceManager.getCurrentDevice().mAddress);
+        String uuid = mDeviceManager.getCurrentDevice().mUuid;
+        mBTService.connect(remote, uuid);
+    }
+
+
+    private void disconnectDevice() {
+        mBTService.stop();
     }
 
     //BTGUIInterface implementation
@@ -206,6 +197,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public String[] getDeviceList() {
         return mDeviceManager.getNames();
     }
+
 
     public boolean isBTEnabled(){
         return mBluetoothAdapter.isEnabled();
@@ -245,46 +237,62 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     }
 
     //Remote Callbacks
-
-    public void setCurrentDevice(String name) {
-        String address = mDeviceManager.getAddress(name);
-        if(address != null)
-            mCurrentRemote = mBluetoothAdapter.getRemoteDevice(address);
+    public void setCurrentDevice(int pos) {
+        String address = mDeviceManager.setCurrentDevice(pos);
     }
 
-    public int getConnectionState() {
-        return mConnectionState;
+
+    public int getPosition() {
+        if(mDeviceManager.isCurrentDeviceInit()) {
+            ArrayList<String> addresses = new ArrayList<>(Arrays.asList(mDeviceManager.getAddresses()));
+            return addresses.indexOf(mDeviceManager.getCurrentDevice().mAddress);
+        } else {
+            return 0;
+        }
     }
 
     public String getName() {
-        String name = null;
-        if(mCurrentRemote != null) {
-            name = mCurrentRemote.getName();
-        }
-        return name;
+        if(mDeviceManager.isCurrentDeviceInit())
+            return mDeviceManager.getCurrentDevice().mName;
+        else
+            return "";
     }
 
     public String getAddress(){
-        String address = "";
-        if(mCurrentRemote != null)
-            address = mCurrentRemote.getAddress();
-        return address;
+        if(mDeviceManager.isCurrentDeviceInit())
+            return mDeviceManager.getCurrentDevice().mAddress;
+        else
+            return "-";
     }
 
     public String[] getUUID() {
         ArrayList<String> uuid = new ArrayList<>();
-        if(mCurrentRemote != null) {
-            Parcelable[] uuids = mCurrentRemote.getUuids();
-            for(Parcelable id : uuids) {
-                uuid.add(id.toString());
+        if(mDeviceManager.isCurrentDeviceInit()) {
+            Parcelable[] uuids = mBluetoothAdapter.getRemoteDevice(
+                    mDeviceManager.getCurrentDevice().mAddress).getUuids();
+            if(uuids != null) {
+                for (Parcelable id : uuids) {
+                    uuid.add(id.toString());
+                }
             }
         }
-        return uuid.toArray(new String[uuid.size()]);
+        if(!uuid.isEmpty())
+            return uuid.toArray(new String[uuid.size()]);
+        else
+            return null;
+    }
+
+
+    public int getConnectionState() {
+        if(mDeviceManager.isCurrentDeviceInit())
+            return mDeviceManager.getCurrentDevice().mState;
+        else
+            return BTService.STATE_NONE;
     }
 
 
     public void onUuidSelected(String uuid) {
-        mSelectedUuid = uuid;
+        mDeviceManager.setCurrentDeviceUuid(uuid);
     }
 
 
@@ -295,19 +303,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             switch (msg.what) {
                 case MESSAGE_STATE_CHANGE:
                     if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    switch (msg.arg1) {
-                        case BTService.STATE_CONNECTED:
-                            mDeviceManager.saveLastRemoteToSharedData(mCurrentRemote.getAddress());
-                            Log.d(TAG,"STATE_CONNECTED");
-                            break;
-                        case BTService.STATE_CONNECTING:
-                            Log.d(TAG, "STATE_CONNECTING");
-                            break;
-                        case BTService.STATE_LISTEN:
-                        case BTService.STATE_NONE:
-                            Log.d(TAG, "STATE_NONE");
-                            break;
-                    }
+                    setState(msg.arg1);
                     break;
                 case MESSAGE_WRITE:
                     Log.d(TAG, "MESSAGE_WRITE");
@@ -327,10 +323,44 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     };
 
+    private void setState(int state) {
+        mDeviceManager.setCurrentDeviceState(state);
+        switch (state) {
+            case BTService.STATE_CONNECTED:
+                mDeviceManager.saveLastRemoteToSharedData();
+                Log.d(TAG,"STATE_CONNECTED");
+                break;
+            case BTService.STATE_CONNECTING:
+                Log.d(TAG, "STATE_CONNECTING");
+                break;
+            case BTService.STATE_NONE:
+                Log.d(TAG, "STATE_NONE");
+                break;
+        }
+        mBTGUIFrag.setConnectionState();
+    }
+
 
     public void onConnectClick() {
-        getUUID();
-        mDeviceManager.saveLastRemoteToSharedData(mCurrentRemote.getAddress());
+        if(mDeviceManager.isCurrentDeviceInit()) {
+            switch (mDeviceManager.getCurrentDevice().mState) {
+                case BTService.STATE_NONE:
+                    connectDevice();
+                    break;
+                case BTService.STATE_CONNECTED:
+                    disconnectDevice();
+                    break;
+                case BTService.STATE_CONNECTING:
+                    disconnectDevice();
+                    break;
+            }
+        }
+    }
+
+
+    public void clearAllRemotes() {
+        mDeviceManager.clearAllDevices();
+        updateBTGUIRemote();
     }
 
 

@@ -15,7 +15,7 @@
         android:textColor="@color/white_solid"
         android:textSize="20dp"
         android:paddingLeft="5dp"
-        android:elevation="8dp" />
+        android:layout_marginLeft="10dp" />
 
     <Switch
         android:layout_width="wrap_content"
@@ -67,7 +67,8 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp"
         android:textSize="20dp"
-        android:paddingLeft="5dp" />
+        android:paddingLeft="5dp"
+        android:layout_marginLeft="10dp" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -133,10 +134,10 @@
         android:layout_marginLeft="30dp" />
 
     <Button
-        android:id="@+id/btn_device_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CONNECT"
+        android:id="@+id/btn_connect_remote"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:text="@string/btn_connect_remote_connect"
         android:textSize="20dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
@@ -148,7 +149,8 @@
         android:textColor="@color/white_solid"
         android:stateListAnimator="@animator/button_elevation"
         android:elevation="2dp"
-        android:layout_below="@+id/spinner_uuids" />
+        android:layout_below="@+id/spinner_uuids"
+        android:tint="@color/color_tertiary"/>
 
     <Spinner
         android:layout_width="wrap_content"

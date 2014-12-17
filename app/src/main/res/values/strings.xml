@@ -10,8 +10,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
-    <string name="action_settings">Settings</string>
+
 
     <!--  DeviceListActivity -->
     <string name="scanning">scanning for devices...</string>
@@ -24,5 +23,11 @@
 
     <!-- BTFragment-->
     <string name="bt_not_enabled_leaving">Bluetooth was not enabled. Leaving Bluetooth Chat.</string>
+    <string name="action_example">Example action</string>
+    <string name="action_clear">Clear Remotes</string>
+
+    <!-- BTGUIFragment-->
+    <string name="btn_connect_remote_connect">CONNECT</string>
+    <string name="btn_connect_remote_disconnect">DISCONNECT</string>
 
 </resources>

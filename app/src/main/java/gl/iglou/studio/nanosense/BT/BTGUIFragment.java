@@ -2,8 +2,13 @@ package gl.iglou.studio.nanosense.BT;
 
 import android.app.Fragment;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,6 +34,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     private boolean D = true;
 
     private final String SCAN_MSG = "Scan for devices...";
+    private final String SELECT_MSG = "- Select a remote to connect -";
 
     private String mTextContent = "BT";
     ArrayList<String> mDeviceSelectionList;
@@ -36,13 +42,20 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
     private BTControlCallback mCallback;
 
-    private Button mDeviceListButton;
+    private Button mButtonConnectRemote;
     private Switch mSwitchAdapter;
     private Switch mSwitchDiscover;
     private TextView mLabelConenctionState;
     private TextView mLabelAddress;
     private Spinner mSpinnerUuids;
     private Spinner mSpinnerRemotes;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,6 +76,8 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mLabelConenctionState = (TextView)rootView.findViewById(R.id.label_current_state);
 
+        mButtonConnectRemote = (Button) rootView.findViewById(R.id.btn_connect_remote);
+
         return rootView;
     }
 
@@ -73,8 +88,8 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mCallback = ((NanoSenseActivity)getActivity()).getBTController();
 
-        mDeviceListButton = (Button) getView().findViewById(R.id.btn_device_list);
-        mDeviceListButton.setOnClickListener( new View.OnClickListener() {
+
+        mButtonConnectRemote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCallback.onConnectClick();
@@ -85,18 +100,21 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mSwitchAdapter.setOnCheckedChangeListener(this);
 
-
         mSwitchDiscover.setOnCheckedChangeListener(this);
 
         mSpinnerRemotes.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String selected = (String) parent.getItemAtPosition(pos);
-                if(selected.contentEquals(SCAN_MSG)) {
-                    mCallback.onScanClick();
-                } else {
-                    mCallback.setCurrentDevice(selected);
-                    updateRemote();
+                switch(selected) {
+                    case SCAN_MSG:
+                        mCallback.onScanClick();
+                        break;
+                    case SELECT_MSG:
+                        break;
+                    default:
+                        mCallback.setCurrentDevice(pos);
+                        updateRemote(false);
                 }
             }
 
@@ -120,9 +138,31 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     public void onStart() {
         super.onStart();
 
-        if(mCallback != null)
-            setRemoteSpinnerSelection(mCallback.getName());
+        if(mDeviceSelectionList.get(0) != SELECT_MSG && mCallback != null)
+            setRemoteSpinnerSelection(mCallback.getPosition());
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_bt_frag,menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_clear:
+                Toast.makeText(getActivity().getApplicationContext(),"CLEAR ALL",Toast.LENGTH_SHORT)
+                        .show();
+                mCallback.clearAllRemotes();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     //RemoteSpinner interface
     private void setRemoteSpinner() {
@@ -134,23 +174,24 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
 
-    public void setRemoteSpinnerSelection(String name) {
-        if(name != null && mDeviceSelectionList.contains(name))
-            mSpinnerRemotes.setSelection(mDeviceSelectionList.indexOf(name));
+    public void setRemoteSpinnerSelection(int pos) {
+        mSpinnerRemotes.setSelection(pos);
     }
 
     private void updateDeviceList() {
         mDeviceSelectionList = new ArrayList<>( Arrays.asList(mCallback.getDeviceList()) );
-        if(mDeviceSelectionList.get(0) == "") {
-            mDeviceSelectionList.clear();
-            mDeviceSelectionList.add("- Select a remote to connect -");
+        if(mDeviceSelectionList.isEmpty()) {
+            mDeviceSelectionList.add(SELECT_MSG);
         }
         mDeviceSelectionList.add(SCAN_MSG);
     }
 
 //UUIDSpinner interface
     private void setUuidSpinner() {
-        mUuidSelectionList = new ArrayList<>( Arrays.asList(mCallback.getUUID()) );
+        if( mCallback.getUUID() != null)
+            mUuidSelectionList = new ArrayList<>( Arrays.asList(mCallback.getUUID()) );
+        else
+            mUuidSelectionList = new ArrayList<>();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, mUuidSelectionList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -198,27 +239,37 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     }
 
 
-    public void updateRemote() {
+    public void updateRemote(boolean reloadRemoteList) {
         mLabelAddress.setText( mCallback.getAddress() );
-        setConnectionState(mCallback.getConnectionState());
-        setRemoteSpinnerSelection(mCallback.getName());
+        setConnectionState();
+        if(reloadRemoteList)
+            setRemoteSpinner();
+        setRemoteSpinnerSelection(mCallback.getPosition());
         setUuidSpinner();
     }
 
-    public void setConnectionState(int state) {
+    public void setConnectionState() {
+        int state = mCallback.getConnectionState();
         String stateLabel = "NONE";
         switch(state) {
             case BTService.STATE_NONE:
                 stateLabel = "DISCONNECTED";
-                mLabelConenctionState.setTextColor(Color.RED);
+                mLabelConenctionState.setTextColor(getResources().getColor(R.color.color_tertiary));
+                mButtonConnectRemote.setText(R.string.btn_connect_remote_connect);
+                ((GradientDrawable)mButtonConnectRemote.getBackground()).setColor(
+                        getResources().getColor(R.color.color_primary));
                 break;
             case BTService.STATE_CONNECTING:
                 stateLabel = "CONNECTING";
+                mLabelConenctionState.setTextColor(getResources().getColor(R.color.color_secondary));
                 mLabelConenctionState.setTextColor(Color.LTGRAY);
                 break;
             case BTService.STATE_CONNECTED:
                 stateLabel = "CONNECTED";
-                mLabelConenctionState.setTextColor(Color.GREEN);
+                mLabelConenctionState.setTextColor(getResources().getColor(R.color.color_primary));
+                mButtonConnectRemote.setText(R.string.btn_connect_remote_disconnect);
+                ((GradientDrawable)mButtonConnectRemote.getBackground()).setColor(
+                        getResources().getColor(R.color.color_tertiary));
                 break;
         }
         mLabelConenctionState.setText(stateLabel);
@@ -232,8 +283,6 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         public String[] getDeviceList();
 
-        public boolean isBTEnabled();
-
         public void setBTActivated(boolean state) ;
 
         public boolean isDiscoverable();
@@ -242,10 +291,11 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
 
         //Remote Callbacks
-
-        public void setCurrentDevice(String name);
+        public void setCurrentDevice(int pos);
 
         public int getConnectionState();
+
+        public int getPosition();
 
         public String getName();
 
@@ -255,7 +305,11 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         public void onUuidSelected(String uuid);
 
-
         public void onConnectClick();
+
+
+        // Menu Callbacks
+        public void clearAllRemotes();
+
     }
 }
