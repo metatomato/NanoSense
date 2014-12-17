@@ -13,38 +13,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
-import gl.iglou.studio.nanosense.R;
 
 /**
  * Created by metatomato on 07.12.14.
  */
-public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallback {
+public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallback,
+        BTCommunicationInterface{
 
     // Debugging
-    private static final String TAG = "BTFragment";
+    public static final String TAG = "BTFragment";
     private static final boolean D = true;
 
     // Message types sent from the BTService Handler
@@ -64,6 +53,12 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     private static final int REQUEST_ENABLE_DISCOVERY = 3;
 
     private static final int BT_DISCOVERABLE_DURATION = 30;
+
+    public static final String ACTION_REMOTE_RESPONSE = "remote_response";
+    public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
+    public static final String EXTRA_RESPONSE_CATEGORY = "category";
+    public static final int EXTRA_CAT_CALIBRATION = 0;
+
 
     // Layout Views
     private ListView mConversationView;
@@ -339,17 +334,22 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
                     dataReceived += msg.arg1;
 
-                    String msgToString = decodeMessage(data,"UTF-8");
+                    String msgToString = BTDataConverter.decodeMessage(data, "UTF-8");
 
                     if(dataBuffer.remaining() > msg.arg1) {
                         dataBuffer.put(data);
                     }
 
                     if(msgToString.contains("\n")) {
-                        getStringFromBuffer(dataBuffer,dataReceived,"UTF-8");
-                        getFloatsFromBuffer(dataBuffer,dataReceived);
-                        getDoublesFromBuffer(dataBuffer,dataReceived);
+                        broadcastCategoryResponse(BTDataConverter.getBytes(dataBuffer,dataReceived));
+                        BTDataConverter.getStringFromBuffer(dataBuffer, dataReceived, "UTF-8");
+                        BTDataConverter.getFloatsFromBuffer(dataBuffer, dataReceived);
+                        BTDataConverter.getDoublesFromBuffer(dataBuffer, dataReceived);
+                        dataBuffer.clear();
+                        dataReceived = 0;
                     }
+
+
 /*
                     byte[] valueBuffer = Arrays.copyOf((byte[]) msg.obj, 8);
                     double value = ByteBuffer.wrap(valueBuffer).getDouble();
@@ -371,58 +371,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     };
 
-    private void getDoublesFromBuffer(ByteBuffer buffer, int size) {
-        int doubleNum = size/8;
-        if(doubleNum >= 1) {
-            buffer.position(0);
-            double[] doubles = new double[doubleNum];
-            buffer.asDoubleBuffer().get(doubles, 0, doubleNum);
-            for (Double d : doubles) {
-                Log.d(TAG, "RECEIVED double: " + String.valueOf(d));
-            }
-        } else {
-            Log.d(TAG,"Not enough data to decode double");
-        }
-    }
 
-    private void getFloatsFromBuffer(ByteBuffer buffer, int size) {
-        int floatNum = size/4;
-        if(floatNum >= 1) {
-            buffer.position(0);
-            float[] floats = new float[floatNum];
-            buffer.asFloatBuffer().get(floats, 0, floatNum);
-            for (float f : floats) {
-                Log.d(TAG, "RECEIVED float: " + String.valueOf(f));
-            }
-        } else {
-            Log.d(TAG,"Not enough data to decode float");
-        }
-    }
-
-    private void getStringFromBuffer(ByteBuffer buffer, int size, String charset) {
-        byte[] message = new byte[size];
-        dataBuffer.position(0);
-        dataBuffer.get(message, 0, size);
-        String finalMessage = new String(message, Charset.forName(charset));
-        Log.d(TAG,"RECEIVED string: " + finalMessage);
-    }
-
-    private String decodeMessage(byte[] msg, String charSet) {
-        String v = new String( msg, Charset.forName(charSet) );
-        Log.d(TAG,"Value decode for " + charSet +": "+ v);
-        return v;
-    }
 
     public void onCalibrateClick()
     {
-        String s = "K\n";
-        try {
-            byte[] b = s.getBytes("UTF-8");
-            mBTService.write(b);
-        } catch (UnsupportedEncodingException e)
-        {
-            Log.d(TAG, "REMOTE SEND MESSAGE FAILED: string encoding error", e);
-        }
+        sendMessage("K\n");
     }
 
 
@@ -502,4 +455,23 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             }
         }
     };
+
+    //SettingsRemoteCallback implementation
+
+    public void sendMessage(String message) {
+        try {
+            byte[] b = message.getBytes("UTF-8");
+            mBTService.write(b);
+        } catch (UnsupportedEncodingException e)
+        {
+            Log.d(TAG, "REMOTE SEND MESSAGE " + message + " FAILED: string encoding error", e);
+        }
+    }
+
+    private void broadcastCategoryResponse(byte[] data) {
+        Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
+        intent.putExtra(EXTRA_RESPONSE_CATEGORY,EXTRA_CAT_CALIBRATION);
+        intent.putExtra(EXTRA_CALIBRATION_FEEDBACK, data);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+    }
 }

@@ -36,6 +36,7 @@ public class NanoSenseActivity extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
 
     private BTFragment mBTFragment;
+    private SettingsFragment mSettingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +110,12 @@ public class NanoSenseActivity extends ActionBarActivity {
             fm.beginTransaction().add(mBTFragment, "BTFrag").commit();
         }
 
+        //Start SettingsFragment
+        if(mSettingsFragment == null) {
+            mSettingsFragment = new SettingsFragment();
+            fm.beginTransaction().add(mSettingsFragment, "SettingsFrag").commit();
+        }
+
         contentViewResolver(MP_FRAGMENT);
     }
 
@@ -157,5 +164,9 @@ public class NanoSenseActivity extends ActionBarActivity {
 
     public BTFragment getBTController() {
         return mBTFragment;
+    }
+
+    public SettingsFragment getSettingsController() {
+        return mSettingsFragment;
     }
 }
