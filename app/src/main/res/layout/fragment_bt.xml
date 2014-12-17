@@ -13,9 +13,9 @@
         android:text="BLUETOOTH ADAPTER"
         android:background="@color/color_secondary"
         android:textColor="@color/white_solid"
-        android:textSize="20dp"
-        android:paddingLeft="5dp"
-        android:layout_marginLeft="10dp" />
+        android:textSize="20sp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
 
     <Switch
         android:layout_width="wrap_content"
@@ -66,9 +66,8 @@
         android:layout_below="@+id/switch_discover_io"
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp"
-        android:textSize="20dp"
-        android:paddingLeft="5dp"
-        android:layout_marginLeft="10dp" />
+        android:textSize="20sp"
+        android:paddingLeft="10dp" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -138,7 +137,7 @@
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:text="@string/btn_connect_remote_connect"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
         android:paddingLeft="15dp"
@@ -148,7 +147,7 @@
         android:background="@drawable/circle"
         android:textColor="@color/white_solid"
         android:stateListAnimator="@animator/button_elevation"
-        android:elevation="2dp"
+        android:elevation="@dimen/btn_elevation"
         android:layout_below="@+id/spinner_uuids"
         android:tint="@color/color_tertiary"/>
 
@@ -159,5 +158,14 @@
         android:layout_alignTop="@+id/label_uuid"
         android:layout_alignStart="@+id/label_current_address"
         android:spinnerMode="dropdown" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CALIBRATE"
+        android:id="@+id/btn_dummy"
+        android:layout_below="@+id/btn_connect_remote"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp" />
 
 </RelativeLayout>

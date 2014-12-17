@@ -58,7 +58,7 @@ public class BTService {
     }
 
     /**
-     * Set the current state of the chat connection
+     * Set the current state of the connection
      * @param state  An integer defining the current connection state
      */
     private synchronized void setState(int state) {

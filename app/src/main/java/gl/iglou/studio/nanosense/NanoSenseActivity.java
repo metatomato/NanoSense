@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
 import gl.iglou.studio.nanosense.BT.BTGUIFragment;
+import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
+import gl.iglou.studio.nanosense.SETTINGS.SettingsGUIFragment;
 
 
 public class NanoSenseActivity extends ActionBarActivity {
@@ -23,10 +25,10 @@ public class NanoSenseActivity extends ActionBarActivity {
 
     public static final int MP_FRAGMENT = 0;
     public static final int BT_FRAGMENT = 1;
-    public static final int SETUP_FRAGMENT = 2;
+    public static final int SETTINGS_FRAGMENT = 2;
     public static final int MONITOR_FRAGMENT = 3;
 
-    String[] mFragmentLabel = {"MediaPlayer", "Bluetooth", "Device Setup", "Monitor"};
+    String[] mFragmentLabel;
 
     private View mNavigationDrawer;
     private Toolbar mToolbar;
@@ -39,6 +41,13 @@ public class NanoSenseActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nano_sense);
+
+        mFragmentLabel = new String[4];
+        mFragmentLabel[0] = getResources().getString(R.string.fragment_label_mp);
+        mFragmentLabel[1] = getResources().getString(R.string.fragment_label_bt);
+        mFragmentLabel[2] = getResources().getString(R.string.fragment_label_settings);
+        mFragmentLabel[3] = getResources().getString(R.string.fragment_label_monitor);
+
 
         //Layout Views Setup
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -115,6 +124,10 @@ public class NanoSenseActivity extends ActionBarActivity {
             case BT_FRAGMENT:
                 main_content_fragment = new BTGUIFragment();
                 mBTFragment.setBTGUIFrag((BTGUIFragment)main_content_fragment);
+                break;
+            case SETTINGS_FRAGMENT:
+                main_content_fragment = new SettingsGUIFragment();
+                mBTFragment.setBTGUIFrag(null);
                 break;
             default:
                 main_content_fragment = new MPFragment();

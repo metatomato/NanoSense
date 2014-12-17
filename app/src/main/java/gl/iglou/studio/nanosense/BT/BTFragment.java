@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,6 +79,9 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     // Member object for the BTDeviceManager
     private BTDeviceManager mDeviceManager = null;
 
+    private ByteBuffer dataBuffer;
+    private int dataReceived = 0;
+
     public BTFragment() {
     }
 
@@ -99,6 +113,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
         getActivity().registerReceiver(mReceiver, filter);
 
+       dataBuffer = ByteBuffer.allocate(4096);
     }
 
 
@@ -309,10 +324,43 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     Log.d(TAG, "MESSAGE_WRITE");
                     break;
                 case MESSAGE_READ:
-                    Log.d(TAG, "MESSAGE_READ");
-                    break;
-                case MESSAGE_DEVICE_NAME:
-                    Log.d(TAG,"MESSAGE_DEVICE_NAME");
+                    Log.d(TAG,"MESSAGE_READ");
+                    /*
+                    ByteBuffer buffer = ByteBuffer.wrap((byte[]) msg.obj, 0, msg.arg1 - 2);
+                    int size = (msg.arg1 - 2)/8;
+                    double[] data = new double[size];
+                    buffer.asDoubleBuffer().get(data, 0, size);
+                    for(double d : data) {
+                        Log.d(TAG,"Value received: " + String.valueOf(d));
+                    }
+                    */
+                    byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
+                    Log.d(TAG,"Received message of lenght: " + String.valueOf(msg.arg1));
+
+                    dataReceived += msg.arg1;
+
+                    String msgToString = decodeMessage(data,"UTF-8");
+
+                    if(dataBuffer.remaining() > msg.arg1) {
+                        dataBuffer.put(data);
+                    }
+
+                    if(msgToString.contains("\n")) {
+                        getStringFromBuffer(dataBuffer,dataReceived,"UTF-8");
+                        getFloatsFromBuffer(dataBuffer,dataReceived);
+                        getDoublesFromBuffer(dataBuffer,dataReceived);
+                    }
+/*
+                    byte[] valueBuffer = Arrays.copyOf((byte[]) msg.obj, 8);
+                    double value = ByteBuffer.wrap(valueBuffer).getDouble();
+                    Log.d(TAG,"Value received in double : " + String.valueOf(value));
+
+                    valueBuffer = Arrays.copyOf((byte[]) msg.obj, 4);
+                    float floatValue = ByteBuffer.wrap(valueBuffer).getFloat();
+                    Log.d(TAG,"Value received in float : " + String.valueOf(floatValue));
+*/
+
+
                     break;
                 case MESSAGE_TOAST:
                     Toast.makeText(getActivity().getApplicationContext(), msg.getData().getString(TOAST),
@@ -322,6 +370,61 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
             }
         }
     };
+
+    private void getDoublesFromBuffer(ByteBuffer buffer, int size) {
+        int doubleNum = size/8;
+        if(doubleNum >= 1) {
+            buffer.position(0);
+            double[] doubles = new double[doubleNum];
+            buffer.asDoubleBuffer().get(doubles, 0, doubleNum);
+            for (Double d : doubles) {
+                Log.d(TAG, "RECEIVED double: " + String.valueOf(d));
+            }
+        } else {
+            Log.d(TAG,"Not enough data to decode double");
+        }
+    }
+
+    private void getFloatsFromBuffer(ByteBuffer buffer, int size) {
+        int floatNum = size/4;
+        if(floatNum >= 1) {
+            buffer.position(0);
+            float[] floats = new float[floatNum];
+            buffer.asFloatBuffer().get(floats, 0, floatNum);
+            for (float f : floats) {
+                Log.d(TAG, "RECEIVED float: " + String.valueOf(f));
+            }
+        } else {
+            Log.d(TAG,"Not enough data to decode float");
+        }
+    }
+
+    private void getStringFromBuffer(ByteBuffer buffer, int size, String charset) {
+        byte[] message = new byte[size];
+        dataBuffer.position(0);
+        dataBuffer.get(message, 0, size);
+        String finalMessage = new String(message, Charset.forName(charset));
+        Log.d(TAG,"RECEIVED string: " + finalMessage);
+    }
+
+    private String decodeMessage(byte[] msg, String charSet) {
+        String v = new String( msg, Charset.forName(charSet) );
+        Log.d(TAG,"Value decode for " + charSet +": "+ v);
+        return v;
+    }
+
+    public void onCalibrateClick()
+    {
+        String s = "K\n";
+        try {
+            byte[] b = s.getBytes("UTF-8");
+            mBTService.write(b);
+        } catch (UnsupportedEncodingException e)
+        {
+            Log.d(TAG, "REMOTE SEND MESSAGE FAILED: string encoding error", e);
+        }
+    }
+
 
     private void setState(int state) {
         mDeviceManager.setCurrentDeviceState(state);

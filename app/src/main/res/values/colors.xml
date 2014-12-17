@@ -8,6 +8,8 @@
     <item name="color_primary_dark" type="color">#289752</item>
     <item name="color_secondary" type="color">#01a2d6</item>
     <item name="color_tertiary" type="color">#f8b13c</item>
+    <item name="color_primary_alpha" type="color">#207cbf4c</item>
+    <item name="color_secondary_alpha" type="color">#2001a2d6</item>
 
 
 </resources>
