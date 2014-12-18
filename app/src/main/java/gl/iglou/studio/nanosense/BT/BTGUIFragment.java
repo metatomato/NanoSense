@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -75,7 +74,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mLabelAddress = (TextView)rootView.findViewById(R.id.label_current_address);
 
-        mLabelConenctionState = (TextView)rootView.findViewById(R.id.label_current_state);
+        mLabelConenctionState = (TextView)rootView.findViewById(R.id.label_state_value);
 
         mButtonConnectRemote = (Button) rootView.findViewById(R.id.btn_connect_remote);
 

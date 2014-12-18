@@ -5,5 +5,7 @@ package gl.iglou.studio.nanosense.BT;
  */
 public interface BTCommunicationInterface {
 
-    void sendMessage(String message);
+    public void sendMessage(String message);
+
+    public boolean isRemoteConnected();
 }

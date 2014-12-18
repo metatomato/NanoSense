@@ -38,9 +38,15 @@
 <!-- SETTINGS-->
     <!-- SettingsGUIFragment-->
     <string name="btn_start">START</string>
+    <string name="btn_stop">STOP</string>
     <string name="btn_calibrate">CALIBRATE</string>
     <string name="label_resistance">R(M&#x3a9;)</string>
     <string name="label_current">I(&#xb5;A)</string>
 
+    <string name="state_disconnected">DISCONNECTED</string>
+    <string name="state_ready">READY</string>
+    <string name="state_broadcasting">BROADCASTING</string>
+
+    <string name="connect_first">Connect a remote first!</string>
 
 </resources>

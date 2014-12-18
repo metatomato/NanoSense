@@ -54,6 +54,9 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
     private static final int BT_DISCOVERABLE_DURATION = 30;
 
+    public static final String ACTION_REMOTE_STATE_CHANGE = "remote_state_change";
+    public static final String EXTRA_REMOTE_STATE = "remote_state";
+
     public static final String ACTION_REMOTE_RESPONSE = "remote_response";
     public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
     public static final String EXTRA_RESPONSE_CATEGORY = "category";
@@ -319,7 +322,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     Log.d(TAG, "MESSAGE_WRITE");
                     break;
                 case MESSAGE_READ:
-                    Log.d(TAG,"MESSAGE_READ");
+                    //Log.d(TAG,"MESSAGE_READ");
                     /*
                     ByteBuffer buffer = ByteBuffer.wrap((byte[]) msg.obj, 0, msg.arg1 - 2);
                     int size = (msg.arg1 - 2)/8;
@@ -330,21 +333,29 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     }
                     */
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
-                    Log.d(TAG,"Received message of lenght: " + String.valueOf(msg.arg1));
+                    //Log.d(TAG,"Received message of lenght: " + String.valueOf(msg.arg1));
 
                     dataReceived += msg.arg1;
 
                     String msgToString = BTDataConverter.decodeMessage(data, "UTF-8");
 
-                    if(dataBuffer.remaining() > msg.arg1) {
-                        dataBuffer.put(data);
+                    if(dataBuffer.remaining() < msg.arg1) {
+                        dataBuffer.clear();
+                        if(dataBuffer.remaining() < msg.arg1) {
+                            Log.d(TAG,"DataBuffer overflow! Message processing aborted!!");
+                            return;
+                        }
                     }
+
+                    dataBuffer.put(data);
 
                     if(msgToString.contains("\n")) {
                         broadcastCategoryResponse(BTDataConverter.getBytes(dataBuffer,dataReceived));
-                        BTDataConverter.getStringFromBuffer(dataBuffer, dataReceived, "UTF-8");
-                        BTDataConverter.getFloatsFromBuffer(dataBuffer, dataReceived);
-                        BTDataConverter.getDoublesFromBuffer(dataBuffer, dataReceived);
+                        String extracted = BTDataConverter.getStringFromBuffer(dataBuffer, dataReceived, "UTF-8");
+                        String[] values = extracted.split("\n");
+                        for(String s : values) Log.d(TAG,s);
+                        //BTDataConverter.getFloatsFromBuffer(dataBuffer, dataReceived);
+                        //BTDataConverter.getDoublesFromBuffer(dataBuffer, dataReceived);
                         dataBuffer.clear();
                         dataReceived = 0;
                     }
@@ -394,6 +405,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                 break;
         }
         mBTGUIFrag.setConnectionState();
+        broadcastRemoteState(state);
     }
 
 
@@ -456,12 +468,25 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     };
 
+
+    //BTCommunicationInterface implementation
+
+    public boolean isRemoteConnected() {
+        if(mDeviceManager.isCurrentDeviceInit()) {
+            return mDeviceManager.getCurrentDevice().mState == BTService.STATE_CONNECTED;
+        }
+        else {
+            return false;
+        }
+    }
+
     //SettingsRemoteCallback implementation
 
     public void sendMessage(String message) {
         try {
             byte[] b = message.getBytes("UTF-8");
             mBTService.write(b);
+            Log.d(TAG, "REMOTE SEND MESSAGE " + message);
         } catch (UnsupportedEncodingException e)
         {
             Log.d(TAG, "REMOTE SEND MESSAGE " + message + " FAILED: string encoding error", e);
@@ -472,6 +497,12 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
         intent.putExtra(EXTRA_RESPONSE_CATEGORY,EXTRA_CAT_CALIBRATION);
         intent.putExtra(EXTRA_CALIBRATION_FEEDBACK, data);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+    }
+
+    private void broadcastRemoteState(int state) {
+        Intent intent = new Intent(ACTION_REMOTE_STATE_CHANGE);
+        intent.putExtra(EXTRA_REMOTE_STATE,state);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 }

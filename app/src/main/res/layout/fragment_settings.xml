@@ -28,7 +28,7 @@
         android:textColor="@color/white_solid"
         android:textSize="20sp"
         android:layout_marginTop="30dp"
-        android:layout_below="@+id/button"
+        android:layout_below="@+id/btn_emission_control"
         android:layout_alignParentStart="true"
         android:paddingLeft="10dp" />
 
@@ -66,7 +66,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="State:"
         android:id="@+id/label_state"
-        android:layout_alignTop="@+id/button"
+        android:layout_alignTop="@+id/btn_emission_control"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp" />
@@ -75,7 +75,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:text="@string/btn_start"
-        android:id="@+id/button"
+        android:id="@+id/btn_emission_control"
         android:background="@drawable/circle"
         android:stateListAnimator="@animator/button_elevation"
         android:textColor="@color/white_solid"
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="DISCONNECTED"
-        android:id="@+id/label_current_state"
+        android:id="@+id/label_state_value"
         android:layout_alignTop="@+id/label_state"
         android:layout_toEndOf="@+id/label_state"
         android:layout_marginLeft="60dp" />
@@ -112,9 +112,9 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="NONE"
-        android:id="@+id/label_current_receiving"
+        android:id="@+id/label_receiving_value"
         android:layout_alignTop="@+id/label_receiving"
-        android:layout_alignStart="@+id/label_current_state" />
+        android:layout_alignStart="@+id/label_state_value" />
 
     <LinearLayout
         android:orientation="vertical"

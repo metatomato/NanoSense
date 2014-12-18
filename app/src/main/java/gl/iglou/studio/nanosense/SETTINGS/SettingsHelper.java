@@ -35,4 +35,14 @@ public class SettingsHelper {
         return Math.round(value);
     }
 
+    public static int calculateCurrent(float value) {
+        double current = (0.25 / (value * 0.000001) - 4870.0) * 0.00128;
+        return Math.round( (float) current);
+    }
+
+    public static int calculateGain(float value) {
+        double gain = 8000.0 / ( value - 5 ) * 0.0512;
+        return Math.round((float) gain);
+    }
+
 }

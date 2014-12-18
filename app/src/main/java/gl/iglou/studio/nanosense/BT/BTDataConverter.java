@@ -47,17 +47,18 @@ public class BTDataConverter {
         }
     }
 
-    public static void getStringFromBuffer(ByteBuffer buffer, int size, String charset) {
+    public static String getStringFromBuffer(ByteBuffer buffer, int size, String charset) {
         byte[] message = new byte[size];
         buffer.position(0);
         buffer.get(message, 0, size);
         String finalMessage = new String(message, Charset.forName(charset));
-        Log.d(TAG,"RECEIVED string: " + finalMessage);
+        return finalMessage;
+        //Log.d(TAG,"RECEIVED string: " + finalMessage);
     }
 
     public static String decodeMessage(byte[] msg, String charSet) {
         String v = new String( msg, Charset.forName(charSet) );
-        Log.d(TAG,"Value decode for " + charSet +": "+ v);
+        //Log.d(TAG,"Value decode for " + charSet +": "+ v);
         return v;
     }
 }

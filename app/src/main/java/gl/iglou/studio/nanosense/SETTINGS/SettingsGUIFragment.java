@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
@@ -30,6 +29,10 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     Button mBtnResetCurrent;
     Button mBtnSetGain;
     Button mBtnResetGain;
+    Button mBtnEmissionControl;
+    TextView mLabelStateValue;
+    TextView mLabelResistance;
+    TextView mLabelCurrent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +53,10 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mBtnResetCurrent = (Button) rootView.findViewById(R.id.btn_current_reset);
         mBtnSetGain = (Button) rootView.findViewById(R.id.btn_set_gain);
         mBtnResetGain = (Button) rootView.findViewById(R.id.btn_gain_reset);
+        mBtnEmissionControl = (Button) rootView.findViewById(R.id.btn_emission_control);
+        mLabelStateValue = (TextView) rootView.findViewById(R.id.label_state_value);
+        mLabelResistance = (TextView) rootView.findViewById(R.id.label_resistance);
+        mLabelCurrent = (TextView) rootView.findViewById(R.id.label_current);
 
         return rootView;
     }
@@ -102,6 +109,9 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mBtnSetGain.setOnClickListener(this);
         mBtnResetCurrent.setOnClickListener(this);
         mBtnResetGain.setOnClickListener(this);
+        mBtnEmissionControl.setOnClickListener(this);
+
+        update();
     }
 
     @Override
@@ -119,6 +129,9 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
             case R.id.btn_gain_reset:
                 mSettingsControlCallback.onResetGainClick();
                 break;
+            case R.id.btn_emission_control:
+                mSettingsControlCallback.onEmissionClick();
+                break;
         }
 
     }
@@ -133,6 +146,51 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mLabelGainValue.setText(String.valueOf(gain));
     }
 
+    public void updateState(int state) {
+        setLabelState(state);
+        setEmissionButton(state);
+    }
+
+    private void setLabelState(int state) {
+        String content = getResources().getString(R.string.state_disconnected);
+        if(state == SettingsFragment.STATE_READY) {
+            content = getResources().getString(R.string.state_ready);
+        } else if(state == SettingsFragment.STATE_BROADCASTING) {
+            content = getResources().getString(R.string.state_broadcasting);
+        }
+        mLabelStateValue.setText(content);
+    }
+
+    private void setEmissionButton(int state) {
+        if(state == SettingsFragment.STATE_READY || state == SettingsFragment.STATE_DISCONNECTED) {
+            ((GradientDrawable)mBtnEmissionControl.getBackground()).setColor(
+                    getResources().getColor(R.color.color_primary));
+            mBtnEmissionControl.setText(getResources().getString(R.string.btn_start));
+        } else if(state == SettingsFragment.STATE_BROADCASTING) {
+            ((GradientDrawable)mBtnEmissionControl.getBackground()).setColor(
+                    getResources().getColor(R.color.color_tertiary));
+            mBtnEmissionControl.setText(getResources().getString(R.string.btn_stop));
+        }
+    }
+
+    private void setCalibrationValues() {
+        String content = getResources().getString(R.string.label_current);
+        content += String.valueOf(mSettingsControlCallback.getRemoteMaxCurrent());
+        mLabelCurrent.setText(content);
+        content = getResources().getString(R.string.label_resistance);
+        content += String.valueOf(mSettingsControlCallback.getRemoteResistance());
+        mLabelResistance.setText(content);
+    }
+
+    public void update() {
+        int state = mSettingsControlCallback.getState();
+        setLabelState(state);
+        setEmissionButton(state);
+        setCalibrationValues();
+        setCurrent(mSettingsControlCallback.getCurrent());
+        setGain(mSettingsControlCallback.getGain());
+    }
+
     public interface SettingsControlCallback {
         public void onCalibrateClick();
         public void onSetCurrentClick();
@@ -141,5 +199,14 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public void onSetGain(float gain);
         public void onResetCurrentClick();
         public void onResetGainClick();
+        public void onEmissionClick();
+
+        public int getState();
+        public boolean isReceiving();
+        public float getRemoteResistance();
+        public float getRemoteMaxCurrent();
+        public float getCurrent();
+        public float getGain();
+
     }
 }
