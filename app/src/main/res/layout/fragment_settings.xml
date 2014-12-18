@@ -200,7 +200,7 @@
             android:layout_toRightOf="@+id/btn_current_reset"
             android:layout_toLeftOf="@+id/label_current_value"
             android:indeterminate="false"
-            android:max="50"
+            android:max="100"
             android:progress="20" />
 
         <TextView
@@ -285,7 +285,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentStart="false"
             android:layout_toRightOf="@+id/btn_gain_reset"
-            android:layout_toLeftOf="@+id/textView2"
+            android:layout_toLeftOf="@+id/label_gain_value"
             android:indeterminate="false"
             android:max="100"
             android:progress="0" />
@@ -295,16 +295,16 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="10"
-            android:id="@+id/textView2"
+            android:id="@+id/label_gain_value"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_gain_value"
+            android:layout_toLeftOf="@+id/btn_set_gain"
             android:layout_marginRight="10dp" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="Set Gain"
-            android:id="@+id/btn_gain_value"
+            android:id="@+id/btn_set_gain"
             android:clickable="false"
             android:background="@color/color_primary"
             android:textColor="@color/white_solid"

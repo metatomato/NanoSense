@@ -25,7 +25,24 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
 
     private static final String CALIBRATE_MSG = "K\n";
 
+    public static final float CURRENT_INITIAL_VALUE = 10.f;
+    public static final float CURRENT_MAX_VALUE = 50.f;
+    public static final float CURRENT_MIN_VALUE = 2.5f;
+    public static final float CURRENT_STEP_VALUE = 2.5f;
+    public static final float GAIN_INITIAL_VALUE = 25.f;
+    public static final float GAIN_MAX_VALUE = 100.f;
+    public static final float GAIN_MIN_VALUE = 25.f;
+    public static final float GAIN_STEP_VALUE = 5.f;
+
+    private float mCurrentValue = CURRENT_INITIAL_VALUE;
+    private float mGainValue = GAIN_INITIAL_VALUE;
+
+    private float mCurrentRemoteValue = CURRENT_INITIAL_VALUE;
+    private float mGainRemoteValue = GAIN_INITIAL_VALUE;
+
     BTCommunicationInterface mMessagingManager;
+
+    SettingsGUIFragment mSettingsGUIFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +76,38 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     };
 
 
+    public void setSettingsGUIFrag(SettingsGUIFragment frag) {
+        mSettingsGUIFragment = frag;
+    }
+
+
 
     //SettingsControlCallback Impelmentation
     public void onCalibrateClick() {
         mMessagingManager.sendMessage(CALIBRATE_MSG);
     }
 
+    public void onSetCurrent(float current) {
+        mCurrentValue = current;
+    }
+
+    public void onSetGain(float gain) {
+        mGainValue = gain;
+    }
+
+    public void onSetCurrentClick() {
+        mCurrentRemoteValue = mCurrentValue;
+    }
+
+    public void onSetGainClick() {
+        mGainRemoteValue = mGainValue;
+    }
+
+    public void onResetCurrentClick() {
+        mSettingsGUIFragment.setCurrent(mCurrentRemoteValue);
+    }
+
+    public void onResetGainClick() {
+        mSettingsGUIFragment.setGain(mGainRemoteValue);
+    }
 }
