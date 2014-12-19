@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -77,8 +78,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     // Member object for the BTDeviceManager
     private BTDeviceManager mDeviceManager = null;
 
-    private ByteBuffer dataBuffer;
-    private int dataReceived = 0;
+   private String mData;
 
     public BTFragment() {
     }
@@ -111,7 +111,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         filter = new IntentFilter(BluetoothDevice.ACTION_UUID);
         getActivity().registerReceiver(mReceiver, filter);
 
-       dataBuffer = ByteBuffer.allocate(4096);
+        mData = new String();
     }
 
 
@@ -323,53 +323,35 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     break;
                 case MESSAGE_READ:
                     //Log.d(TAG,"MESSAGE_READ");
-                    /*
-                    ByteBuffer buffer = ByteBuffer.wrap((byte[]) msg.obj, 0, msg.arg1 - 2);
-                    int size = (msg.arg1 - 2)/8;
-                    double[] data = new double[size];
-                    buffer.asDoubleBuffer().get(data, 0, size);
-                    for(double d : data) {
-                        Log.d(TAG,"Value received: " + String.valueOf(d));
-                    }
-                    */
+
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
-                    //Log.d(TAG,"Received message of lenght: " + String.valueOf(msg.arg1));
 
-                    dataReceived += msg.arg1;
+                    String message = BTDataConverter.decodeMessage(data, "UTF-8");
+                    //Log.d(TAG,"F " + message);
+                    mData += message;
 
-                    String msgToString = BTDataConverter.decodeMessage(data, "UTF-8");
-
-                    if(dataBuffer.remaining() < msg.arg1) {
-                        dataBuffer.clear();
-                        if(dataBuffer.remaining() < msg.arg1) {
-                            Log.d(TAG,"DataBuffer overflow! Message processing aborted!!");
-                            return;
+                    if(mData.contains("\n")) {
+                        int mark = mData.lastIndexOf("\n");
+                        String extracted = mData.substring(0,mark);
+                        String[] values = extracted.split("[\\r\\n]+");
+                        for(String s : values){
+                            try {
+                                float value = Float.parseFloat(s);
+                                Log.d(TAG,"X " + String.valueOf(value));
+                            } catch (NumberFormatException e) {
+                                Log.d(TAG,"String2Float FAILED! ");
+                            }
                         }
-                    }
 
-                    dataBuffer.put(data);
-
-                    if(msgToString.contains("\n")) {
-                        broadcastCategoryResponse(BTDataConverter.getBytes(dataBuffer,dataReceived));
-                        String extracted = BTDataConverter.getStringFromBuffer(dataBuffer, dataReceived, "UTF-8");
-                        String[] values = extracted.split("\n");
-                        for(String s : values) Log.d(TAG,s);
-                        //BTDataConverter.getFloatsFromBuffer(dataBuffer, dataReceived);
-                        //BTDataConverter.getDoublesFromBuffer(dataBuffer, dataReceived);
-                        dataBuffer.clear();
-                        dataReceived = 0;
+                        if(!mData.endsWith("\n")) {
+                            mData = mData.substring(mark + 1);
+                        } else {
+                            mData = "";
+                        }
+                        //Log.d(TAG,"R " + mData);
                     }
 
 
-/*
-                    byte[] valueBuffer = Arrays.copyOf((byte[]) msg.obj, 8);
-                    double value = ByteBuffer.wrap(valueBuffer).getDouble();
-                    Log.d(TAG,"Value received in double : " + String.valueOf(value));
-
-                    valueBuffer = Arrays.copyOf((byte[]) msg.obj, 4);
-                    float floatValue = ByteBuffer.wrap(valueBuffer).getFloat();
-                    Log.d(TAG,"Value received in float : " + String.valueOf(floatValue));
-*/
 
 
                     break;

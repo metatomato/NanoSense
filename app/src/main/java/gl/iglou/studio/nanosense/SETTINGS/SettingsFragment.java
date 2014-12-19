@@ -152,7 +152,7 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         String message = prepareMessage(MSG_SET_CURRENT,mCalculatedCurrent);
         mMessagingManager.sendMessage(message);
 
-        Log.d(TAG,"Gain set to " + String.valueOf(mCalculatedCurrent) + " from " +
+        Log.d(TAG,"Current set to " + String.valueOf(mCalculatedCurrent) + " from " +
                 String.valueOf(mCurrentRemoteValue));
 
     }
@@ -160,6 +160,10 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public void onSetGainClick() {
         mGainRemoteValue = mGainValue;
         mCalculatedGain = SettingsHelper.calculateGain(mGainRemoteValue);
+
+        String message = prepareMessage(MSG_SET_GAIN,mCalculatedGain);
+        mMessagingManager.sendMessage(message);
+
         Log.d(TAG,"Gain set to " + String.valueOf(mCalculatedGain) + " from " +
                 String.valueOf(mGainRemoteValue));
     }
