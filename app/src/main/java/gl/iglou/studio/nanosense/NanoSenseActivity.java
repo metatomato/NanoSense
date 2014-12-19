@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
 import gl.iglou.studio.nanosense.BT.BTGUIFragment;
+import gl.iglou.studio.nanosense.MP.MPFragment;
+import gl.iglou.studio.nanosense.MP.MPGUIFragment;
 import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
 import gl.iglou.studio.nanosense.SETTINGS.SettingsGUIFragment;
 
@@ -35,6 +37,7 @@ public class NanoSenseActivity extends ActionBarActivity {
     private View mContentView;
     private DrawerLayout mDrawerLayout;
 
+    private MPFragment mMPFragment;
     private BTFragment mBTFragment;
     private SettingsFragment mSettingsFragment;
 
@@ -116,6 +119,13 @@ public class NanoSenseActivity extends ActionBarActivity {
             fm.beginTransaction().add(mSettingsFragment, "SettingsFrag").commit();
         }
 
+        //Start MPFragment
+        if(mMPFragment == null) {
+            mMPFragment = new MPFragment();
+            fm.beginTransaction().add(mMPFragment, "MPFrag").commit();
+        }
+
+
         contentViewResolver(MP_FRAGMENT);
     }
 
@@ -124,8 +134,10 @@ public class NanoSenseActivity extends ActionBarActivity {
         FragmentManager fragmentManager = getFragmentManager();
         Fragment main_content_fragment;
         switch(fragmentId) {
+            default:
             case MP_FRAGMENT :
-                main_content_fragment = new MPFragment();
+                main_content_fragment = new MPGUIFragment();
+                mMPFragment.setMPGUIFrag((MPGUIFragment)main_content_fragment);
                 mBTFragment.setBTGUIFrag(null);
                 mSettingsFragment.setSettingsGUIFrag(null);
                 break;
@@ -133,16 +145,14 @@ public class NanoSenseActivity extends ActionBarActivity {
                 main_content_fragment = new BTGUIFragment();
                 mBTFragment.setBTGUIFrag((BTGUIFragment)main_content_fragment);
                 mSettingsFragment.setSettingsGUIFrag(null);
+                mMPFragment.setMPGUIFrag(null);
                 break;
             case SETTINGS_FRAGMENT:
                 main_content_fragment = new SettingsGUIFragment();
                 mSettingsFragment.setSettingsGUIFrag((SettingsGUIFragment)main_content_fragment);
                 mBTFragment.setBTGUIFrag(null);
+                mMPFragment.setMPGUIFrag(null);
                 break;
-            default:
-                main_content_fragment = new MPFragment();
-                mBTFragment.setBTGUIFrag(null);
-                mSettingsFragment.setSettingsGUIFrag(null);
         }
 
         fragmentManager.beginTransaction()
@@ -173,4 +183,6 @@ public class NanoSenseActivity extends ActionBarActivity {
     public SettingsFragment getSettingsController() {
         return mSettingsFragment;
     }
+
+    public MPFragment getMPController() { return mMPFragment; }
 }

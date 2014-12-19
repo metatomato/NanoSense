@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="gl.iglou.studio.nanosense.MP.MPFragment">
+
+    <ImageView
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:id="@+id/imageView_album_art"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="124dp"
+        android:src="@drawable/nanomade_splash_2k"
+        android:elevation="4dp"
+        android:background="@color/white_solid" />
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/imageView_album_art"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp" />
+
+    <Button
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:text="PLAY"
+        android:id="@+id/btn_play"
+        android:layout_below="@+id/progressBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/circle"
+        android:textColor="@color/white_solid"
+        android:textSize="30sp" />
+
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="NEXT"
+        android:id="@+id/btn_next"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/circle"
+        android:layout_alignTop="@+id/btn_play"
+        android:layout_toEndOf="@+id/btn_play"
+        android:textColor="@color/white_solid"
+        android:textSize="20sp" />
+
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="PREV"
+        android:id="@+id/btn_prev"
+        android:background="@drawable/circle"
+        android:layout_alignTop="@+id/btn_next"
+        android:layout_toStartOf="@+id/btn_play"
+        android:textColor="@color/white_solid"
+        android:textSize="20sp" />
+
+</RelativeLayout>
