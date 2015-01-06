@@ -11,10 +11,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.Toast;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
 import gl.iglou.studio.nanosense.BT.BTGUIFragment;
+import gl.iglou.studio.nanosense.MONITOR.MonitorFragment;
+import gl.iglou.studio.nanosense.MONITOR.MonitorGUIFragment;
 import gl.iglou.studio.nanosense.MP.MPFragment;
 import gl.iglou.studio.nanosense.MP.MPGUIFragment;
 import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
@@ -40,6 +41,7 @@ public class NanoSenseActivity extends ActionBarActivity {
     private MPFragment mMPFragment;
     private BTFragment mBTFragment;
     private SettingsFragment mSettingsFragment;
+    private MonitorFragment mMonitorFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +127,12 @@ public class NanoSenseActivity extends ActionBarActivity {
             fm.beginTransaction().add(mMPFragment, "MPFrag").commit();
         }
 
+        //Start MonitorFragment
+        if(mMonitorFragment == null) {
+            mMonitorFragment = new MonitorFragment();
+            fm.beginTransaction().add(mMonitorFragment, "MonitorFrag").commit();
+        }
+
 
         contentViewResolver(MP_FRAGMENT);
     }
@@ -140,18 +148,28 @@ public class NanoSenseActivity extends ActionBarActivity {
                 mMPFragment.setMPGUIFrag((MPGUIFragment)main_content_fragment);
                 mBTFragment.setBTGUIFrag(null);
                 mSettingsFragment.setSettingsGUIFrag(null);
+                mMonitorFragment.setMonitorGUIFrag(null);
                 break;
             case BT_FRAGMENT:
                 main_content_fragment = new BTGUIFragment();
                 mBTFragment.setBTGUIFrag((BTGUIFragment)main_content_fragment);
                 mSettingsFragment.setSettingsGUIFrag(null);
                 mMPFragment.setMPGUIFrag(null);
+                mMonitorFragment.setMonitorGUIFrag(null);
                 break;
             case SETTINGS_FRAGMENT:
                 main_content_fragment = new SettingsGUIFragment();
                 mSettingsFragment.setSettingsGUIFrag((SettingsGUIFragment)main_content_fragment);
                 mBTFragment.setBTGUIFrag(null);
                 mMPFragment.setMPGUIFrag(null);
+                mMonitorFragment.setMonitorGUIFrag(null);
+                break;
+            case MONITOR_FRAGMENT:
+                main_content_fragment = new MonitorGUIFragment();
+                mMonitorFragment.setMonitorGUIFrag((MonitorGUIFragment) main_content_fragment);
+                mBTFragment.setBTGUIFrag(null);
+                mMPFragment.setMPGUIFrag(null);
+                mSettingsFragment.setSettingsGUIFrag(null);
                 break;
         }
 
