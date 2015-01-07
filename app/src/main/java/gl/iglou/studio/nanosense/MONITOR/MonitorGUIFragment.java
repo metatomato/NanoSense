@@ -1,6 +1,7 @@
 package gl.iglou.studio.nanosense.MONITOR;
 
 
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
@@ -8,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.*;
 
@@ -20,6 +23,7 @@ import java.util.TimerTask;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
+import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,6 +32,7 @@ public class MonitorGUIFragment extends Fragment {
 
     private static final String TAG = "MonitorFragment";
     private XYPlot mPlot;
+    private Button mStartStopBtn;
     private MonitorControlCallback mMonitorControlCallback;
 
 
@@ -71,7 +76,23 @@ public class MonitorGUIFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_monitor,container,false);
 
         mPlot = (XYPlot) rootView.findViewById(R.id.mySimpleXYPlot);
+        mStartStopBtn = (Button) rootView.findViewById(R.id.btn_start_stop);
 
+        mStartStopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int state = mMonitorControlCallback.onStartStopClick();
+                if(state == SettingsFragment.STATE_BROADCASTING) {
+                    ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
+                            getResources().getColor(R.color.color_tertiary));
+                    mStartStopBtn.setText(getResources().getString(R.string.btn_stop));
+                } else {
+                    ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
+                            getResources().getColor(R.color.color_primary));
+                    mStartStopBtn.setText(getResources().getString(R.string.btn_start));
+                }
+            }
+        });
 
         // Create a formatter to use for drawing a series using LineAndPointRenderer
         // and configure it from xml:
@@ -86,6 +107,8 @@ public class MonitorGUIFragment extends Fragment {
         // reduce the number of range labels
         mPlot.setTicksPerRangeLabel(3);
         mPlot.getGraphWidget().setDomainLabelOrientation(-45);
+
+        mPlot.setRangeBoundaries(0.0, 5.0, BoundaryMode.FIXED);
 
         return rootView;
     }
@@ -116,6 +139,7 @@ public class MonitorGUIFragment extends Fragment {
         public XYSeries getData();
         public void onGUIStart();
         public void onGUIStop();
+        public int onStartStopClick();
     }
 
 }

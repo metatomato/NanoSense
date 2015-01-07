@@ -117,6 +117,13 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        mSettingsControlCallback.onGUIPause();
+    }
+
+    @Override
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_set_current:
@@ -207,6 +214,8 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public void onResetCurrentClick();
         public void onResetGainClick();
         public void onEmissionClick();
+
+        public void onGUIPause();
 
         public int getState();
         public boolean isReceiving();

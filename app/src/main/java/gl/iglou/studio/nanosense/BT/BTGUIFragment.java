@@ -76,7 +76,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mLabelConenctionState = (TextView)rootView.findViewById(R.id.label_state_value);
 
-        mButtonConnectRemote = (Button) rootView.findViewById(R.id.btn_connect_remote);
+        mButtonConnectRemote = (Button) rootView.findViewById(R.id.btn_start_stop);
 
         mButtonCalibrate = (Button) rootView.findViewById(R.id.btn_dummy);
 

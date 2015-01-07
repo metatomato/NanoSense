@@ -133,7 +133,7 @@
         android:layout_marginLeft="30dp" />
 
     <Button
-        android:id="@+id/btn_connect_remote"
+        android:id="@+id/btn_start_stop"
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:text="@string/btn_connect_remote_connect"
@@ -164,7 +164,7 @@
         android:layout_height="wrap_content"
         android:text="CALIBRATE"
         android:id="@+id/btn_dummy"
-        android:layout_below="@+id/btn_connect_remote"
+        android:layout_below="@+id/btn_start_stop"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="37dp" />
 

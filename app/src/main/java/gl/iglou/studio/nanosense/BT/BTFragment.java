@@ -338,7 +338,9 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         for(String s : values){
                             try {
                                 float value = Float.parseFloat(s);
-                                Log.d(TAG,"X " + String.valueOf(value));
+                                //Log.d(TAG,"X " + String.valueOf(value));
+                                if(value > 10)
+                                    Log.d(TAG,"BTFrag catch out-of-range: " + String.valueOf(value));
                                 broadcastDataRate(value);
                             } catch (NumberFormatException e) {
                                 Log.d(TAG,"String2Float FAILED! ");

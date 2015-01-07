@@ -254,8 +254,14 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
 
     private void setState(int state) {
         mRemoteState = state;
-        mSettingsGUIFragment.updateState(state);
-        updateDataRateScheduler(state);
+        if(mSettingsGUIFragment.isAdded()) {
+            mSettingsGUIFragment.updateState(state);
+            updateDataRateScheduler(state);
+        }
+    }
+
+    public void onGUIPause() {
+        dataRateStop();
     }
 
 

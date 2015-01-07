@@ -43,6 +43,11 @@ public class NanoSenseActivity extends ActionBarActivity {
     private SettingsFragment mSettingsFragment;
     private MonitorFragment mMonitorFragment;
 
+    private MPGUIFragment mMPGUIFragment;
+    private BTGUIFragment mBTGUIFragment;
+    private SettingsGUIFragment mSettingsGUIFragment;
+    private MonitorGUIFragment mMonitorGUIFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,32 +149,32 @@ public class NanoSenseActivity extends ActionBarActivity {
         switch(fragmentId) {
             default:
             case MP_FRAGMENT :
-                main_content_fragment = new MPGUIFragment();
-                mMPFragment.setMPGUIFrag((MPGUIFragment)main_content_fragment);
-                mBTFragment.setBTGUIFrag(null);
-                mSettingsFragment.setSettingsGUIFrag(null);
-                mMonitorFragment.setMonitorGUIFrag(null);
+                if(mMPGUIFragment == null) {
+                    mMPGUIFragment = new MPGUIFragment();
+                    mMPFragment.setMPGUIFrag(mMPGUIFragment);
+                }
+                main_content_fragment = mMPGUIFragment;
                 break;
             case BT_FRAGMENT:
-                main_content_fragment = new BTGUIFragment();
-                mBTFragment.setBTGUIFrag((BTGUIFragment)main_content_fragment);
-                mSettingsFragment.setSettingsGUIFrag(null);
-                mMPFragment.setMPGUIFrag(null);
-                mMonitorFragment.setMonitorGUIFrag(null);
+                if(mBTGUIFragment == null) {
+                    mBTGUIFragment = new BTGUIFragment();
+                    mBTFragment.setBTGUIFrag(mBTGUIFragment);
+                }
+                main_content_fragment = mBTGUIFragment;
                 break;
             case SETTINGS_FRAGMENT:
-                main_content_fragment = new SettingsGUIFragment();
-                mSettingsFragment.setSettingsGUIFrag((SettingsGUIFragment)main_content_fragment);
-                mBTFragment.setBTGUIFrag(null);
-                mMPFragment.setMPGUIFrag(null);
-                mMonitorFragment.setMonitorGUIFrag(null);
+                if(mSettingsGUIFragment == null) {
+                    mSettingsGUIFragment = new SettingsGUIFragment();
+                    mSettingsFragment.setSettingsGUIFrag(mSettingsGUIFragment);
+                }
+                main_content_fragment = mSettingsGUIFragment;
                 break;
             case MONITOR_FRAGMENT:
-                main_content_fragment = new MonitorGUIFragment();
-                mMonitorFragment.setMonitorGUIFrag((MonitorGUIFragment) main_content_fragment);
-                mBTFragment.setBTGUIFrag(null);
-                mMPFragment.setMPGUIFrag(null);
-                mSettingsFragment.setSettingsGUIFrag(null);
+                if(mMonitorGUIFragment == null) {
+                    mMonitorGUIFragment = new MonitorGUIFragment();
+                    mMonitorFragment.setMonitorGUIFrag(mMonitorGUIFragment);
+                }
+                main_content_fragment = mMonitorGUIFragment;
                 break;
         }
 
