@@ -203,4 +203,6 @@ public class NanoSenseActivity extends ActionBarActivity {
     }
 
     public MPFragment getMPController() { return mMPFragment; }
+
+    public MonitorFragment getMonitorController() { return mMonitorFragment; }
 }

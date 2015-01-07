@@ -3,6 +3,7 @@ package gl.iglou.studio.nanosense.MONITOR;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
 
 /**
@@ -26,24 +28,35 @@ public class MonitorGUIFragment extends Fragment {
 
     private static final String TAG = "MonitorFragment";
     private XYPlot mPlot;
-    private SimpleXYSeries mSerie;
+    private MonitorControlCallback mMonitorControlCallback;
 
-    int mPlotCount = 0;
+
+    private Handler mPlotScheduler;
+    private Runnable mPlotSchedulerTask;
     long mStartTime = 0L;
-    Timer mGenerator;
-    Timer mUpdateTimer;
 
-    private final int PLOT_SIZE = 300;
-    private final long PLOT_INITIAL_STEP = 5L;
-
-    private final double AMP_MAX = 4.0;
-
-
+    public static final int PLOT_SIZE = 300;
+    public static final long PLOT_INITIAL_STEP = 5L;
 
     public MonitorGUIFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mMonitorControlCallback = ((NanoSenseActivity)getActivity()).getMonitorController();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        launchPlotScheduler();
+
+        mMonitorControlCallback.onGUIStart();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,9 +64,9 @@ public class MonitorGUIFragment extends Fragment {
 
         mStartTime = System.currentTimeMillis();
 
-        initSerie();
+        //initSerie();
 
-        launchGenerator();
+        //launchGenerator();
 
         View rootView = inflater.inflate(R.layout.fragment_monitor,container,false);
 
@@ -68,78 +81,41 @@ public class MonitorGUIFragment extends Fragment {
                 R.xml.line_point_formatter_with_plf2);
 
         // add a new series' to the xyplot:
-        mPlot.addSeries(mSerie, series1Format);
+        mPlot.addSeries(mMonitorControlCallback.getData(), series1Format);
 
         // reduce the number of range labels
         mPlot.setTicksPerRangeLabel(3);
         mPlot.getGraphWidget().setDomainLabelOrientation(-45);
 
-
-        mUpdateTimer = new Timer();
-        mUpdateTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                mPlot.redraw();
-            }
-        }, new Date(mStartTime + 1000), 100);
-
-
         return rootView;
     }
 
 
-
-    private void initSerie() {
-        ArrayList<Number> listY = new ArrayList<>();
-        ArrayList<Number> listX = new ArrayList<>();
-        for(int i = 0 ; i < PLOT_SIZE; i++) {
-            listX.add(i * PLOT_INITIAL_STEP );
-            listY.add(0.0);
-        }
-        mSerie = new SimpleXYSeries(listX,listY,"data");
-    }
-
-    private void launchGenerator() {
-        Log.d(TAG, String.valueOf(mStartTime));
-
-        mGenerator = new Timer();
-        mGenerator.schedule(new TimerTask() {
+    private void launchPlotScheduler() {
+        mPlotScheduler = new Handler();
+        mPlotSchedulerTask = new Runnable() {
             @Override
             public void run() {
-                Number dataX = generateX();
-                Number dataY = generateY();
-                updateSerie(dataX,dataY);
-               // Log.d(TAG, String.valueOf(dataX) + "    " + String.valueOf(dataY));
+                mPlot.redraw();
+                mPlotScheduler.postDelayed(this,100L);
             }
-        }, new Date(mStartTime + 1000), PLOT_INITIAL_STEP);
+        };
+        mPlotScheduler.postDelayed( mPlotSchedulerTask, 0L);
     }
 
-
-    private Number generateX() {
-        return System.currentTimeMillis() - mStartTime - 1000;
-    }
-
-    private Number generateY() {
-        Random mYGenerator = new Random();
-        return (mYGenerator.nextDouble() * 2.0 - 1.0) * AMP_MAX;
-    }
-
-    private void updateSerie(Number X, Number Y) {
-        if(mPlotCount < PLOT_SIZE) {
-            mSerie.setXY(X,Y,mPlotCount);
-        } else {
-            mSerie.removeFirst();
-            mSerie.addLast(X,Y);
-        }
-        mPlotCount++;
-    }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        mUpdateTimer.cancel();
-        mGenerator.cancel();
+        mMonitorControlCallback.onGUIStop();
+        mPlotScheduler.removeCallbacks(mPlotSchedulerTask);
+    }
+
+    public interface MonitorControlCallback {
+        public XYSeries getData();
+        public void onGUIStart();
+        public void onGUIStop();
     }
 
 }

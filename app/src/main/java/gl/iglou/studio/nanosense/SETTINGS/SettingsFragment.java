@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import gl.iglou.studio.nanosense.BT.BTCommunicationInterface;
 import gl.iglou.studio.nanosense.BT.BTFragment;
@@ -56,6 +58,14 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     private int mCalculatedCurrent;
     private int mCalculatedGain;
 
+
+    //DataRate Processing Vars
+    private Handler mDataRateScheduler;
+    private Runnable mSchedulerTask;
+    private float mDataRate = 0.f;
+    private ArrayList<Number> mData;
+    private long timer;
+
     BTCommunicationInterface mMessagingManager;
 
     SettingsGUIFragment mSettingsGUIFragment;
@@ -68,6 +78,9 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
                 new IntentFilter(BTFragment.ACTION_REMOTE_RESPONSE));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver,
                 new IntentFilter(BTFragment.ACTION_REMOTE_STATE_CHANGE));
+
+        mData = new ArrayList<>();
+        initDataRateScheduler();
     }
 
     @Override
@@ -92,6 +105,9 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
                             byte[] data = intent.getByteArrayExtra(BTFragment.EXTRA_CALIBRATION_FEEDBACK);
                             String sData = new String(data, Charset.forName("UTF-8"));
                             Log.d(TAG, "Local Broadcastreceived: " + sData);
+                            break;
+                        case BTFragment.EXTRA_CAT_SENSOR_DATA:
+                            mData.add(intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f));
                             break;
                     }
                     break;
@@ -131,6 +147,49 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         }
     }
 
+    private void initDataRateScheduler() {
+        mDataRateScheduler = new Handler();
+        mSchedulerTask = new Runnable() {
+            @Override
+            public void run() {
+                updateDataRate();
+                mDataRateScheduler.postDelayed(this, 100);
+            }
+        };
+    }
+
+    private void dataRateStart() {
+        timer = System.currentTimeMillis();
+        mDataRateScheduler.postDelayed(mSchedulerTask, 0);
+    }
+
+    private void dataRateStop() {
+        mDataRateScheduler.removeCallbacks(mSchedulerTask);
+        mDataRate = 0.f;
+        mSettingsGUIFragment.setDataRateValue(mDataRate);
+    }
+
+    private void updateDataRate() {
+        timer = System.currentTimeMillis() - timer;
+        mDataRate = mData.size() *  1000.f / timer;
+        mSettingsGUIFragment.setDataRateValue(mDataRate);
+        timer = System.currentTimeMillis();
+        mData.clear();
+    }
+
+    private void updateDataRateScheduler(int state) {
+        switch(state) {
+            case STATE_READY:
+                dataRateStop();
+                break;
+            case STATE_DISCONNECTED:
+                dataRateStop();
+                break;
+            case STATE_BROADCASTING:
+                dataRateStart();
+                break;
+        }
+    }
 
 //SettingsControlCallback Impelmentation
     public void onCalibrateClick() {
@@ -196,6 +255,7 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     private void setState(int state) {
         mRemoteState = state;
         mSettingsGUIFragment.updateState(state);
+        updateDataRateScheduler(state);
     }
 
 
@@ -205,4 +265,5 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public float getRemoteMaxCurrent() { return 0.f; }
     public float getCurrent() { return mCurrentValue; }
     public float getGain() { return mGainValue; }
+    public float getDataRate() {return mDataRate;}
 }

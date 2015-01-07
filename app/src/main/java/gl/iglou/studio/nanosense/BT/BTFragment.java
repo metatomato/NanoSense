@@ -21,8 +21,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -59,9 +57,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public static final String EXTRA_REMOTE_STATE = "remote_state";
 
     public static final String ACTION_REMOTE_RESPONSE = "remote_response";
-    public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
     public static final String EXTRA_RESPONSE_CATEGORY = "category";
     public static final int EXTRA_CAT_CALIBRATION = 0;
+    public static final int EXTRA_CAT_SENSOR_DATA = 1;
+    public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
+    public static final String EXTRA_SENSOR_DATA_FEEDBACK = "sensor_data_feedback";
 
 
     // Layout Views
@@ -78,7 +78,8 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     // Member object for the BTDeviceManager
     private BTDeviceManager mDeviceManager = null;
 
-   private String mData;
+    // Received data processing Vars
+    private String mData;
 
     public BTFragment() {
     }
@@ -338,6 +339,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                             try {
                                 float value = Float.parseFloat(s);
                                 Log.d(TAG,"X " + String.valueOf(value));
+                                broadcastDataRate(value);
                             } catch (NumberFormatException e) {
                                 Log.d(TAG,"String2Float FAILED! ");
                             }
@@ -348,7 +350,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         } else {
                             mData = "";
                         }
-                        //Log.d(TAG,"R " + mData);
                     }
 
 
@@ -479,6 +480,13 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
         intent.putExtra(EXTRA_RESPONSE_CATEGORY,EXTRA_CAT_CALIBRATION);
         intent.putExtra(EXTRA_CALIBRATION_FEEDBACK, data);
+        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+    }
+
+    private void broadcastDataRate(float rate) {
+        Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
+        intent.putExtra(EXTRA_RESPONSE_CATEGORY, EXTRA_CAT_SENSOR_DATA);
+        intent.putExtra(EXTRA_SENSOR_DATA_FEEDBACK,rate);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 

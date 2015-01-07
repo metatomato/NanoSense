@@ -33,6 +33,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     TextView mLabelStateValue;
     TextView mLabelResistance;
     TextView mLabelCurrent;
+    TextView mLabelReceivingValue;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +58,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mLabelStateValue = (TextView) rootView.findViewById(R.id.label_state_value);
         mLabelResistance = (TextView) rootView.findViewById(R.id.label_resistance);
         mLabelCurrent = (TextView) rootView.findViewById(R.id.label_current);
+        mLabelReceivingValue = (TextView) rootView.findViewById(R.id.label_receiving_value);
 
         return rootView;
     }
@@ -189,6 +191,11 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         setCalibrationValues();
         setCurrent(mSettingsControlCallback.getCurrent());
         setGain(mSettingsControlCallback.getGain());
+        setDataRateValue(mSettingsControlCallback.getDataRate());
+    }
+
+    public void setDataRateValue(float rate) {
+        mLabelReceivingValue.setText(String.format("%.1f",rate) + " Hz");
     }
 
     public interface SettingsControlCallback {
@@ -207,6 +214,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public float getRemoteMaxCurrent();
         public float getCurrent();
         public float getGain();
+        public float getDataRate();
 
     }
 }
