@@ -328,7 +328,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
 
                     String message = BTDataConverter.decodeMessage(data, "UTF-8");
-                    //Log.d(TAG,"F " + message);
+                    //Log.d(TAG,"RAW MSG " + message);
                     mData += message;
 
                     if(mData.contains("\n")) {
@@ -336,22 +336,24 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         String extracted = mData.substring(0,mark);
                         String[] values = extracted.split("[\\r\\n]+");
                         for(String s : values){
-                            try {
-                                float value = Float.parseFloat(s);
-                                //Log.d(TAG,"X " + String.valueOf(value));
-                                if(value > 10)
-                                    Log.d(TAG,"BTFrag catch out-of-range: " + String.valueOf(value));
-                                broadcastDataRate(value);
-                            } catch (NumberFormatException e) {
-                                Log.d(TAG,"String2Float FAILED! ");
+                            if(s.matches("\\d\\.[\\d]{3}")) {
+                                //Log.d(TAG, "MATCHED: " + s);
+                                try {
+                                    float value = Float.parseFloat(s);
+                                    broadcastDataRate(value);
+                                } catch (NumberFormatException e) {
+                                    Log.d(TAG, "String2Float FAILED! ");
+                                }
                             }
                         }
+
 
                         if(!mData.endsWith("\n")) {
                             mData = mData.substring(mark + 1);
                         } else {
                             mData = "";
                         }
+
                     }
 
 

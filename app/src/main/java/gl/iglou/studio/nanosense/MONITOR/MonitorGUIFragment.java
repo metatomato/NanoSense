@@ -5,21 +5,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
@@ -31,7 +22,8 @@ import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
 public class MonitorGUIFragment extends Fragment {
 
     private static final String TAG = "MonitorFragment";
-    private XYPlot mPlot;
+    private XYPlot mPrimaryPlot;
+    private XYPlot mSecondaryPlot;
     private Button mStartStopBtn;
     private MonitorControlCallback mMonitorControlCallback;
 
@@ -40,7 +32,7 @@ public class MonitorGUIFragment extends Fragment {
     private Runnable mPlotSchedulerTask;
     long mStartTime = 0L;
 
-    public static final int PLOT_SIZE = 300;
+    public static final int PLOT_SIZE = 1000;
     public static final long PLOT_INITIAL_STEP = 5L;
 
     public MonitorGUIFragment() {
@@ -75,7 +67,8 @@ public class MonitorGUIFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_monitor,container,false);
 
-        mPlot = (XYPlot) rootView.findViewById(R.id.mySimpleXYPlot);
+        mPrimaryPlot = (XYPlot) rootView.findViewById(R.id.primary_plot);
+        mSecondaryPlot = (XYPlot) rootView.findViewById(R.id.secondary_plot);
         mStartStopBtn = (Button) rootView.findViewById(R.id.btn_start_stop);
 
         mStartStopBtn.setOnClickListener(new View.OnClickListener() {
@@ -102,13 +95,14 @@ public class MonitorGUIFragment extends Fragment {
                 R.xml.line_point_formatter_with_plf2);
 
         // add a new series' to the xyplot:
-        mPlot.addSeries(mMonitorControlCallback.getData(), series1Format);
+        mPrimaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_PRIMARY), series1Format);
+        mSecondaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_SECONDARY), series1Format);
 
         // reduce the number of range labels
-        mPlot.setTicksPerRangeLabel(3);
-        mPlot.getGraphWidget().setDomainLabelOrientation(-45);
+        mPrimaryPlot.setTicksPerRangeLabel(3);
+        mPrimaryPlot.getGraphWidget().setDomainLabelOrientation(-45);
 
-        mPlot.setRangeBoundaries(0.0, 5.0, BoundaryMode.FIXED);
+        mPrimaryPlot.setRangeBoundaries(0.0, 5.0, BoundaryMode.FIXED);
 
         return rootView;
     }
@@ -119,13 +113,18 @@ public class MonitorGUIFragment extends Fragment {
         mPlotSchedulerTask = new Runnable() {
             @Override
             public void run() {
-                mPlot.redraw();
+                mPrimaryPlot.redraw();
+                mSecondaryPlot.redraw();
                 mPlotScheduler.postDelayed(this,100L);
             }
         };
         mPlotScheduler.postDelayed( mPlotSchedulerTask, 0L);
     }
 
+
+    public void updateExtrema(float yMin, float yMax) {
+        mPrimaryPlot.setRangeBoundaries(yMin, yMax, BoundaryMode.AUTO);
+    }
 
     @Override
     public void onStop() {
@@ -136,7 +135,7 @@ public class MonitorGUIFragment extends Fragment {
     }
 
     public interface MonitorControlCallback {
-        public XYSeries getData();
+        public XYSeries getData(int serieId);
         public void onGUIStart();
         public void onGUIStop();
         public int onStartStopClick();

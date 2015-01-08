@@ -31,8 +31,12 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     static private final int SERIE_MODE_REMOTE = 0;
     static private final int SERIE_MODE_GENERATOR = 1;
 
+    static public final int SERIE_PRIMARY = 0;
+    static public final int SERIE_SECONDARY = 1;
+
     private MonitorGUIFragment mMonitorGUIFragment;
-    private SimpleXYSeries mSerie;
+    private SimpleXYSeries mPrimarySerie;
+    private SimpleXYSeries mSecondarySerie;
     private int mSerieMode = SERIE_MODE_REMOTE;
 
     private int mPlotCount = 0;
@@ -47,6 +51,8 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     private boolean mBuffered = false;
     private long mDataStart = 0L;
 
+    private float mYMin,mYMax;
+
     private SettingsGUIFragment.SettingsControlCallback mSettingsControlCallback;
 
     public MonitorFragment() {}
@@ -57,7 +63,8 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
 
         mBuffer = new ArrayList<>();
 
-        initSerie();
+        initSerie(SERIE_PRIMARY);
+        initSerie(SERIE_SECONDARY);
         initGenerator();
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver,
@@ -109,8 +116,12 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
 
 
 // MonitorControlCallback Methods Implementation
-    public XYSeries getData() {
-        return mSerie;
+    public XYSeries getData(int serieId) {
+        if(serieId == SERIE_PRIMARY) {
+            return mPrimarySerie;
+        } else {
+            return mSecondarySerie;
+        }
     }
 
     public void onGUIStart() {
@@ -146,6 +157,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
                 mDataStart = System.currentTimeMillis();
             }
         }else {
+            /*
             if (System.currentTimeMillis() - mDataStart > 1000L){
                 if (value < 10.f) {
                     float deltaLimit = 1.f;
@@ -161,6 +173,10 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             } else {
                 updateBuffer(value);
             }
+            */
+            updateSerie(SERIE_PRIMARY,smoothData());
+            updateSerie(SERIE_SECONDARY,value);
+            updateBuffer(value);
         }
     }
 
@@ -169,12 +185,19 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         mBuffer.add(value);
     }
 
-    float bufferMean() {
+    float meanData() {
         float sum = 0.f;
         for(Number n : mBuffer) {
             sum += n.floatValue();
         }
         return sum / mBufferSize;
+    }
+
+    float smoothData() {
+        float smoothData = mBuffer.get(0).floatValue() + 2.f * mBuffer.get(1).floatValue()
+                + 3.f * mBuffer.get(2).floatValue() + 2.f * mBuffer.get(3).floatValue()
+                + mBuffer.get(4).floatValue();
+        return smoothData / 9.f;
     }
 
     float bufferMeanDerivative() {
@@ -187,30 +210,43 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     }
 
 // Serie Helper Methods
-    private void initSerie() {
+    private void initSerie(int serieId) {
         ArrayList<Number> listY = new ArrayList<>();
         ArrayList<Number> listX = new ArrayList<>();
         for(int i = 0 ; i < MonitorGUIFragment.PLOT_SIZE; i++) {
             listX.add(0.0);
             listY.add(0.0);
         }
-        mSerie = new SimpleXYSeries(listX,listY,"data");
+        if(serieId == SERIE_PRIMARY) {
+            mPrimarySerie = new SimpleXYSeries(listX, listY, "data");
+        } else {
+            mSecondarySerie = new SimpleXYSeries(listX, listY, "data");
+        }
         mPlotCount = 0;
     }
 
-    private void updateSerie(Number Y) {
-        mSerie.removeFirst();
-        Number lastX = mSerie.getX(mSerie.size() - 1 ).doubleValue() + MonitorGUIFragment.PLOT_INITIAL_STEP;
-        mSerie.addLast(lastX,Y);
+    private void updateSerie(int serieId, Number Y) {
+       SimpleXYSeries currentSerie = getSerie(serieId);
+        currentSerie.removeFirst();
+        Number lastX = currentSerie.getX(currentSerie.size() - 1 ).doubleValue() + MonitorGUIFragment.PLOT_INITIAL_STEP;
+        currentSerie.addLast(lastX, Y);
         //Log.d(TAG,"X: " + String.valueOf(X) + "     Y: " + String.valueOf(Y));
     }
 
-    private void resetSerie() {
+    private void resetSerie(int serieId) {
         for(int i = 0 ; i < MonitorGUIFragment.PLOT_SIZE ; i++) {
-            mSerie.setXY(0.0,0.0,i);
+            getSerie(serieId).setXY(0.0, 0.0, i);
         }
     }
 
+
+    private SimpleXYSeries getSerie(int serieId) {
+        if(serieId == SERIE_PRIMARY) {
+            return mPrimarySerie;
+        } else {
+            return mSecondarySerie;
+        }
+    }
 
 
 // Testing Purpose Serie Generator
@@ -221,7 +257,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             public void run() {
                 Number dataX = generateX();
                 Number dataY = generateY();
-                updateSerie(dataY);
+                updateSerie(SERIE_PRIMARY, dataY);
 
                 mGeneratorScheduler.postDelayed(this,MonitorGUIFragment.PLOT_INITIAL_STEP);
             }
