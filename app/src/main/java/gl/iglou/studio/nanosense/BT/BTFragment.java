@@ -24,6 +24,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import gl.iglou.studio.nanosense.MONITOR.MonitorFragment;
+import gl.iglou.studio.nanosense.NanoSenseActivity;
+
 
 /**
  * Created by metatomato on 07.12.14.
@@ -63,6 +66,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
     public static final String EXTRA_SENSOR_DATA_FEEDBACK = "sensor_data_feedback";
 
+    private MonitorFragment mDataManager;
 
     // Layout Views
     private ListView mConversationView;
@@ -168,6 +172,13 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     }
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mDataManager = ((NanoSenseActivity)getActivity()).getMonitorController();
+    }
 
     public void setBTGUIFrag(BTGUIFragment frag) {
         if(frag != null) {
@@ -328,7 +339,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
 
                     String message = BTDataConverter.decodeMessage(data, "UTF-8");
-                    //Log.d(TAG,"RAW MSG " + message);
+                   // Log.d(TAG,"RAW MSG " + message);
                     mData += message;
 
                     if(mData.contains("\n")) {
@@ -337,23 +348,25 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         String[] values = extracted.split("[\\r\\n]+");
                         for(String s : values){
                             if(s.matches("\\d\\.[\\d]{3}")) {
-                                //Log.d(TAG, "MATCHED: " + s);
+                              //  Log.d(TAG, "Broadcasted: " + s);
                                 try {
                                     float value = Float.parseFloat(s);
-                                    broadcastDataRate(value);
+                                    mDataManager.processData(value);
+                                  //  broadcastRemoteData(value);
                                 } catch (NumberFormatException e) {
                                     Log.d(TAG, "String2Float FAILED! ");
                                 }
                             }
                         }
 
-
+                        mData = "";
+/*
                         if(!mData.endsWith("\n")) {
                             mData = mData.substring(mark + 1);
                         } else {
                             mData = "";
                         }
-
+*/
                     }
 
 
@@ -487,7 +500,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 
-    private void broadcastDataRate(float rate) {
+    private void broadcastRemoteData(float rate) {
         Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
         intent.putExtra(EXTRA_RESPONSE_CATEGORY, EXTRA_CAT_SENSOR_DATA);
         intent.putExtra(EXTRA_SENSOR_DATA_FEEDBACK,rate);

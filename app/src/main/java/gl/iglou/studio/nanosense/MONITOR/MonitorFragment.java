@@ -103,7 +103,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
                             break;
                         case BTFragment.EXTRA_CAT_SENSOR_DATA:
                             float value = (intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f));
-                            processData(value);
+                            //processData(value);
                             break;
                     }
                     break;
@@ -149,7 +149,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     }
 
 
-    void processData(float value) {
+    public void processData(float value) {
         if(!mBuffered){
             mBuffer.add(value);
             if(mBuffer.size() == mBufferSize) {
@@ -175,7 +175,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             }
             */
             updateSerie(SERIE_PRIMARY,smoothData());
-            updateSerie(SERIE_SECONDARY,value);
+            updateSerie(SERIE_SECONDARY,derivateData());
             updateBuffer(value);
         }
     }
@@ -191,6 +191,12 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             sum += n.floatValue();
         }
         return sum / mBufferSize;
+    }
+
+
+    private float derivateData() {
+        float derivate =  mBuffer.get(4).floatValue() -  mBuffer.get(0).floatValue();
+        return derivate / (4.f * MonitorGUIFragment.PLOT_INITIAL_STEP) * 1000.f;
     }
 
     float smoothData() {

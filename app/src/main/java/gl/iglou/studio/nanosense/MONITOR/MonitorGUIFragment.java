@@ -32,7 +32,7 @@ public class MonitorGUIFragment extends Fragment {
     private Runnable mPlotSchedulerTask;
     long mStartTime = 0L;
 
-    public static final int PLOT_SIZE = 1000;
+    public static final int PLOT_SIZE = 500;
     public static final long PLOT_INITIAL_STEP = 5L;
 
     public MonitorGUIFragment() {
@@ -102,7 +102,8 @@ public class MonitorGUIFragment extends Fragment {
         mPrimaryPlot.setTicksPerRangeLabel(3);
         mPrimaryPlot.getGraphWidget().setDomainLabelOrientation(-45);
 
-        mPrimaryPlot.setRangeBoundaries(0.0, 5.0, BoundaryMode.FIXED);
+        mPrimaryPlot.setRangeBoundaries(1.0, 4.0, BoundaryMode.FIXED);
+       // mSecondaryPlot.setRangeBoundaries(1.0, 4.0, BoundaryMode.FIXED);
 
         return rootView;
     }
