@@ -22,7 +22,7 @@ import java.util.HashSet;
 import gl.iglou.studio.nanosense.R;
 
 
-public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallback {
+public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallback, MPInterface {
 
     public static final String TAG = "MPFragment";
 

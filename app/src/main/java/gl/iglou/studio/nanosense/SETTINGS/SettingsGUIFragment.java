@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.R;
 
@@ -34,6 +36,8 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     TextView mLabelResistance;
     TextView mLabelCurrent;
     TextView mLabelReceivingValue;
+
+    private DecimalFormat mRateFormatter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +71,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mRateFormatter = new DecimalFormat("000.0");
         mSettingsControlCallback = ((NanoSenseActivity)getActivity()).getSettingsController();
     }
 
@@ -114,6 +119,13 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mBtnEmissionControl.setOnClickListener(this);
 
         update();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mSettingsControlCallback.onGUIStart();
     }
 
     @Override
@@ -198,11 +210,11 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         setCalibrationValues();
         setCurrent(mSettingsControlCallback.getCurrent());
         setGain(mSettingsControlCallback.getGain());
-        setDataRateValue(mSettingsControlCallback.getDataRate());
+        setDataRateValue(mSettingsControlCallback.getDataHighRate(),mSettingsControlCallback.getDataLowRate());
     }
 
-    public void setDataRateValue(float rate) {
-        mLabelReceivingValue.setText(String.format("%.1f",rate) + " Hz");
+    public void setDataRateValue(float highRate, float lowRate) {
+        mLabelReceivingValue.setText(mRateFormatter.format(highRate) + " | " +  mRateFormatter.format(lowRate));
     }
 
     public interface SettingsControlCallback {
@@ -216,6 +228,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public void onEmissionClick();
 
         public void onGUIPause();
+        public void onGUIStart();
 
         public int getState();
         public boolean isReceiving();
@@ -223,7 +236,8 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public float getRemoteMaxCurrent();
         public float getCurrent();
         public float getGain();
-        public float getDataRate();
+        public float getDataHighRate();
+        public float getDataLowRate();
 
     }
 }

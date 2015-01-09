@@ -61,10 +61,14 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
 
     //DataRate Processing Vars
     private Handler mDataRateScheduler;
-    private Runnable mSchedulerTask;
-    private float mDataRate = 0.f;
-    private ArrayList<Number> mData;
-    private long timer;
+    private Runnable mHighFrequncyTask;
+    private Runnable mLowFrequncyTask;
+    private float mDataHighRate = 0.f;
+    private float mDataLowRate = 0.f;
+    private ArrayList<Number> mHighFrequencyData;
+    private ArrayList<Number> mLowFrequencyData;
+    private long mHighFrequencyClock;
+    private long mLowFrequencyClock;
 
     BTCommunicationInterface mMessagingManager;
 
@@ -79,7 +83,8 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver,
                 new IntentFilter(BTFragment.ACTION_REMOTE_STATE_CHANGE));
 
-        mData = new ArrayList<>();
+        mHighFrequencyData = new ArrayList<>();
+        mLowFrequencyData = new ArrayList<>();
         initDataRateScheduler();
     }
 
@@ -107,7 +112,9 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
                             Log.d(TAG, "Local Broadcastreceived: " + sData);
                             break;
                         case BTFragment.EXTRA_CAT_SENSOR_DATA:
-                            mData.add(intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f));
+                            float value = intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f);
+                            mHighFrequencyData.add(value);
+                            mLowFrequencyData.add(value);
                             break;
                     }
                     break;
@@ -149,32 +156,53 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
 
     private void initDataRateScheduler() {
         mDataRateScheduler = new Handler();
-        mSchedulerTask = new Runnable() {
+        mHighFrequncyTask = new Runnable() {
             @Override
             public void run() {
-                updateDataRate();
-                mDataRateScheduler.postDelayed(this, 100);
+                updateDataHighRate();
+                mDataRateScheduler.postDelayed(this, 300L);
+            }
+        };
+
+        mLowFrequncyTask = new Runnable() {
+            @Override
+            public void run() {
+                updateDataLowRate();
+                mDataRateScheduler.postDelayed(this, 3000L);
             }
         };
     }
 
     private void dataRateStart() {
-        timer = System.currentTimeMillis();
-        mDataRateScheduler.postDelayed(mSchedulerTask, 0);
+        mHighFrequencyClock = System.currentTimeMillis();
+        mLowFrequencyClock = System.currentTimeMillis();
+        mDataRateScheduler.post(mHighFrequncyTask);
+        mDataRateScheduler.post(mLowFrequncyTask);
     }
 
     private void dataRateStop() {
-        mDataRateScheduler.removeCallbacks(mSchedulerTask);
-        mDataRate = 0.f;
-        mSettingsGUIFragment.setDataRateValue(mDataRate);
+        mDataRateScheduler.removeCallbacks(mHighFrequncyTask);
+        mDataRateScheduler.removeCallbacks(mLowFrequncyTask);
+        mDataHighRate = 0.f;
+        mDataLowRate = 0.f;
+        mSettingsGUIFragment.setDataRateValue(mDataHighRate,mDataLowRate);
     }
 
-    private void updateDataRate() {
-        timer = System.currentTimeMillis() - timer;
-        mDataRate = mData.size() *  1000.f / timer;
-        mSettingsGUIFragment.setDataRateValue(mDataRate);
-        timer = System.currentTimeMillis();
-        mData.clear();
+    private void updateDataHighRate() {
+        mHighFrequencyClock = System.currentTimeMillis() - mHighFrequencyClock;
+        mDataHighRate = mHighFrequencyData.size() *  1000.f / mHighFrequencyClock;
+        mSettingsGUIFragment.setDataRateValue(mDataHighRate,mDataLowRate);
+        mHighFrequencyClock = System.currentTimeMillis();
+        mHighFrequencyData.clear();
+    }
+
+
+    private void updateDataLowRate() {
+        mLowFrequencyClock = System.currentTimeMillis() - mLowFrequencyClock;
+        mDataLowRate = mLowFrequencyData.size() *  1000.f / mLowFrequencyClock;
+        mSettingsGUIFragment.setDataRateValue(mDataHighRate,mDataLowRate);
+        mLowFrequencyClock = System.currentTimeMillis();
+        mLowFrequencyData.clear();
     }
 
     private void updateDataRateScheduler(int state) {
@@ -263,6 +291,10 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public void onGUIPause() {
         dataRateStop();
     }
+    public void onGUIStart() {
+        dataRateStart();
+    }
+
 
 
     public int getState() { return mRemoteState; }
@@ -271,5 +303,6 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public float getRemoteMaxCurrent() { return 0.f; }
     public float getCurrent() { return mCurrentValue; }
     public float getGain() { return mGainValue; }
-    public float getDataRate() {return mDataRate;}
+    public float getDataHighRate() {return mDataHighRate;}
+    public float getDataLowRate() {return mDataLowRate;}
 }

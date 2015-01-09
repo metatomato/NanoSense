@@ -102,8 +102,8 @@ public class MonitorGUIFragment extends Fragment {
         mPrimaryPlot.setTicksPerRangeLabel(3);
         mPrimaryPlot.getGraphWidget().setDomainLabelOrientation(-45);
 
-        mPrimaryPlot.setRangeBoundaries(1.0, 4.0, BoundaryMode.FIXED);
-       // mSecondaryPlot.setRangeBoundaries(1.0, 4.0, BoundaryMode.FIXED);
+        mPrimaryPlot.setRangeBoundaries(1.0, 5.0, BoundaryMode.FIXED);
+        //mSecondaryPlot.setRangeBoundaries(-20.0, 20.0, BoundaryMode.FIXED);
 
         return rootView;
     }

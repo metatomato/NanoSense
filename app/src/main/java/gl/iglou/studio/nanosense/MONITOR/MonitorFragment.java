@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
+import gl.iglou.studio.nanosense.MP.MPInterface;
 import gl.iglou.studio.nanosense.NanoSenseActivity;
 import gl.iglou.studio.nanosense.SETTINGS.SettingsGUIFragment;
 
@@ -47,11 +48,17 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     private final double AMP_MAX = 4.0;
 
     private ArrayList<Number> mBuffer;
-    private int mBufferSize = 5;
+    private int mBufferSize = 7;
     private boolean mBuffered = false;
     private long mDataStart = 0L;
 
     private float mYMin,mYMax;
+
+    private boolean mReverseData = false;
+
+    private MPInterface mMPCallback;
+    private float mMinTimeElapsed = 300.f;
+    private long mLastTrigger = 0L;
 
     private SettingsGUIFragment.SettingsControlCallback mSettingsControlCallback;
 
@@ -84,6 +91,8 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         super.onActivityCreated(savedInstanceState);
 
         mSettingsControlCallback = ((NanoSenseActivity)getActivity()).getSettingsController();
+
+        mMPCallback = ((NanoSenseActivity)getActivity()).getMPController();
     }
 
     public void setMonitorGUIFrag(MonitorGUIFragment fragment) {
@@ -150,8 +159,14 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
 
 
     public void processData(float value) {
+        float data;
+        if(!mReverseData) {
+            data = 5 - value;
+        } else {
+            data = value;
+        }
         if(!mBuffered){
-            mBuffer.add(value);
+            mBuffer.add(data);
             if(mBuffer.size() == mBufferSize) {
                 mBuffered = true;
                 mDataStart = System.currentTimeMillis();
@@ -175,8 +190,17 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             }
             */
             updateSerie(SERIE_PRIMARY,smoothData());
-            updateSerie(SERIE_SECONDARY,derivateData());
-            updateBuffer(value);
+            float derivate = smoothDerivateData();
+            updateSerie(SERIE_SECONDARY,derivate);
+
+            if(Math.abs(derivate) > 5) {
+                if(System.currentTimeMillis() - mLastTrigger > mMinTimeElapsed) {
+                    mMPCallback.onNextClick();
+                    mLastTrigger = System.currentTimeMillis();
+                }
+            }
+
+            updateBuffer(data);
         }
     }
 
@@ -199,14 +223,24 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         return derivate / (4.f * MonitorGUIFragment.PLOT_INITIAL_STEP) * 1000.f;
     }
 
+    private float smoothDerivateData() {
+        float smoothDerivate =    1.f * ( mBuffer.get(1).floatValue() - mBuffer.get(0).floatValue())
+                                + 2.f * ( mBuffer.get(2).floatValue() - mBuffer.get(1).floatValue())
+                                + 3.f * ( mBuffer.get(3).floatValue() - mBuffer.get(2).floatValue())
+                                + 3.f * ( mBuffer.get(4).floatValue() - mBuffer.get(3).floatValue())
+                                + 2.f * ( mBuffer.get(5).floatValue() - mBuffer.get(4).floatValue())
+                                + 1.f * ( mBuffer.get(6).floatValue() - mBuffer.get(5).floatValue());
+        return smoothDerivate / ( 12.f * 6.f * MonitorGUIFragment.PLOT_INITIAL_STEP) * 1000.f;
+    }
+
     float smoothData() {
-        float smoothData = mBuffer.get(0).floatValue() + 2.f * mBuffer.get(1).floatValue()
-                + 3.f * mBuffer.get(2).floatValue() + 2.f * mBuffer.get(3).floatValue()
-                + mBuffer.get(4).floatValue();
+        float smoothData = mBuffer.get(1).floatValue() + 2.f * mBuffer.get(2).floatValue()
+                + 3.f * mBuffer.get(3).floatValue() + 2.f * mBuffer.get(4).floatValue()
+                + mBuffer.get(5).floatValue();
         return smoothData / 9.f;
     }
 
-    float bufferMeanDerivative() {
+    private float meanDerivateData() {
         float sum = 0.f;
         for(int i = 1; i < mBufferSize; i++) {
             sum += mBuffer.get(i).floatValue() - mBuffer.get(i - 1).floatValue();

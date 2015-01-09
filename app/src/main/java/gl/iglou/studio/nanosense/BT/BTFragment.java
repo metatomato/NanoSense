@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import gl.iglou.studio.nanosense.MONITOR.MonitorFragment;
 import gl.iglou.studio.nanosense.NanoSenseActivity;
+import gl.iglou.studio.nanosense.SETTINGS.SettingsFragment;
 
 
 /**
@@ -67,6 +68,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
     public static final String EXTRA_SENSOR_DATA_FEEDBACK = "sensor_data_feedback";
 
     private MonitorFragment mDataManager;
+    private SettingsFragment mDataProcessor;
 
     // Layout Views
     private ListView mConversationView;
@@ -178,6 +180,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         super.onActivityCreated(savedInstanceState);
 
         mDataManager = ((NanoSenseActivity)getActivity()).getMonitorController();
+        mDataProcessor = ((NanoSenseActivity)getActivity()).getSettingsController();
     }
 
     public void setBTGUIFrag(BTGUIFragment frag) {
@@ -339,7 +342,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
 
                     String message = BTDataConverter.decodeMessage(data, "UTF-8");
-                   // Log.d(TAG,"RAW MSG " + message);
+                    Log.d(TAG,"RAW MSG " + message);
                     mData += message;
 
                     if(mData.contains("\n")) {
@@ -348,25 +351,21 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         String[] values = extracted.split("[\\r\\n]+");
                         for(String s : values){
                             if(s.matches("\\d\\.[\\d]{3}")) {
-                              //  Log.d(TAG, "Broadcasted: " + s);
                                 try {
                                     float value = Float.parseFloat(s);
                                     mDataManager.processData(value);
-                                  //  broadcastRemoteData(value);
+                                    broadcastRemoteData(value);
+                                    Log.d(TAG, "Broadcasted: " + String.valueOf(value));
                                 } catch (NumberFormatException e) {
                                     Log.d(TAG, "String2Float FAILED! ");
                                 }
                             }
                         }
-
-                        mData = "";
-/*
                         if(!mData.endsWith("\n")) {
                             mData = mData.substring(mark + 1);
                         } else {
                             mData = "";
                         }
-*/
                     }
 
 
