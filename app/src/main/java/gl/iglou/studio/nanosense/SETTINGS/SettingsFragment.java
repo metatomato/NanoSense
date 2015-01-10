@@ -43,11 +43,20 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public static final float GAIN_MIN_VALUE = 25.f;
     public static final float GAIN_STEP_VALUE = 5.f;
 
+    public static final float SWIPE_INITIAL_VALUE = 5.f;
+    public static final float SWIPE_MAX_VALUE = 10.f;
+    public static final float SWIPE_MIN_VALUE = 1.f;
+    public static final float SWIPE_STEP_VALUE = 1.f;
+
     private float mCurrentValue = CURRENT_INITIAL_VALUE;
     private float mGainValue = GAIN_INITIAL_VALUE;
+    private float mSwipeValue = SWIPE_INITIAL_VALUE;
 
     private float mCurrentRemoteValue = CURRENT_INITIAL_VALUE;
     private float mGainRemoteValue = GAIN_INITIAL_VALUE;
+    private float mSwipeRemoteValue = SWIPE_INITIAL_VALUE;
+
+
 
     public static final int STATE_DISCONNECTED = 0;
     public static final int STATE_READY = 1;
@@ -232,6 +241,10 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         mGainValue = gain;
     }
 
+    public void onSetSwipe(float swipe) {
+        mSwipeValue = swipe;
+    }
+
     public void onSetCurrentClick() {
         mCurrentRemoteValue = mCurrentValue;
         mCalculatedCurrent = SettingsHelper.calculateCurrent(mCurrentRemoteValue);
@@ -255,12 +268,22 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
                 String.valueOf(mGainRemoteValue));
     }
 
+    public void onSetSwipeClick() {
+        mSwipeRemoteValue = mSwipeValue;
+
+        Log.d(TAG,"Swipe set to " + String.valueOf(mSwipeRemoteValue));
+    }
+
     public void onResetCurrentClick() {
         mSettingsGUIFragment.setCurrent(mCurrentRemoteValue);
     }
 
     public void onResetGainClick() {
         mSettingsGUIFragment.setGain(mGainRemoteValue);
+    }
+
+    public void onResetSwipeClick() {
+        mSettingsGUIFragment.setGain(mSwipeRemoteValue);
     }
 
     public void onEmissionClick() {
@@ -303,6 +326,8 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     public float getRemoteMaxCurrent() { return 0.f; }
     public float getCurrent() { return mCurrentValue; }
     public float getGain() { return mGainValue; }
+    public float getSwipe() {return mSwipeRemoteValue;}
     public float getDataHighRate() {return mDataHighRate;}
     public float getDataLowRate() {return mDataLowRate;}
+
 }

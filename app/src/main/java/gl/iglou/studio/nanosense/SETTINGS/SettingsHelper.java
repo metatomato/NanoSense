@@ -23,6 +23,14 @@ public class SettingsHelper {
         return step * SettingsFragment.GAIN_STEP_VALUE;
     }
 
+    public static float convertSwipe(int progress) {
+        float value = progress * (SettingsFragment.SWIPE_MAX_VALUE
+                - SettingsFragment.SWIPE_MIN_VALUE) / 100.f
+                + SettingsFragment.SWIPE_MIN_VALUE;
+        int step = Math.round(value / SettingsFragment.SWIPE_STEP_VALUE);
+        return step * SettingsFragment.SWIPE_STEP_VALUE;
+    }
+
     public static int revertCurrent(float current) {
         float value = (current - SettingsFragment.CURRENT_MIN_VALUE)
                 * 100.f/ (SettingsFragment.CURRENT_MAX_VALUE - SettingsFragment.CURRENT_MIN_VALUE);
@@ -32,6 +40,12 @@ public class SettingsHelper {
     public static int revertGain(float gain) {
         float value = (gain - SettingsFragment.GAIN_MIN_VALUE)
                 * 100.f / ( SettingsFragment.GAIN_MAX_VALUE - SettingsFragment.GAIN_MIN_VALUE);
+        return Math.round(value);
+    }
+
+    public static int revertSwipe(float swipe) {
+        float value = (swipe - SettingsFragment.SWIPE_MIN_VALUE)
+                * 100.f / ( SettingsFragment.SWIPE_MAX_VALUE - SettingsFragment.SWIPE_MIN_VALUE);
         return Math.round(value);
     }
 

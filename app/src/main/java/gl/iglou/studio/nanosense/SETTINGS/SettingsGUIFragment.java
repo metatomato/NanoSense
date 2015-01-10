@@ -36,6 +36,10 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     TextView mLabelResistance;
     TextView mLabelCurrent;
     TextView mLabelReceivingValue;
+    SeekBar mSeekBarSwipe;
+    Button mBtnSetSwipe;
+    Button mBtnResetSwipe;
+    TextView mLabelSwipeValue;
 
     private DecimalFormat mRateFormatter;
 
@@ -63,6 +67,12 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         mLabelResistance = (TextView) rootView.findViewById(R.id.label_resistance);
         mLabelCurrent = (TextView) rootView.findViewById(R.id.label_current);
         mLabelReceivingValue = (TextView) rootView.findViewById(R.id.label_receiving_value);
+        //Swipe related Views
+        mSeekBarSwipe = (SeekBar) rootView.findViewById(R.id.seekBar_swipe);
+        mBtnSetSwipe = (Button)  rootView.findViewById(R.id.btn_set_swipe);
+        mBtnResetSwipe = (Button) rootView.findViewById(R.id.btn_swipe_reset);
+        mLabelSwipeValue = (TextView) rootView.findViewById(R.id.label_swipe_value);
+
 
         return rootView;
     }
@@ -112,10 +122,24 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
             }
         });
 
+        mSeekBarSwipe.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            float swipe;
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                swipe = SettingsHelper.convertSwipe(progress);
+                mLabelSwipeValue.setText(String.valueOf(swipe));
+            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mSettingsControlCallback.onSetSwipe(swipe);
+            }
+        });
+
         mBtnSetCurrent.setOnClickListener(this);
         mBtnSetGain.setOnClickListener(this);
+        mBtnSetSwipe.setOnClickListener(this);
         mBtnResetCurrent.setOnClickListener(this);
         mBtnResetGain.setOnClickListener(this);
+        mBtnResetSwipe.setOnClickListener(this);
         mBtnEmissionControl.setOnClickListener(this);
 
         update();
@@ -144,11 +168,17 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
             case R.id.btn_set_gain:
                 mSettingsControlCallback.onSetGainClick();
                 break;
+            case R.id.btn_set_swipe:
+                mSettingsControlCallback.onSetSwipeClick();
+                break;
             case R.id.btn_current_reset:
                 mSettingsControlCallback.onResetCurrentClick();
                 break;
             case R.id.btn_gain_reset:
                 mSettingsControlCallback.onResetGainClick();
+                break;
+            case R.id.btn_swipe_reset:
+                mSettingsControlCallback.onResetSwipeClick();
                 break;
             case R.id.btn_emission_control:
                 mSettingsControlCallback.onEmissionClick();
@@ -165,6 +195,11 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     public void setGain(float gain) {
         mSeekBarGain.setProgress(SettingsHelper.revertGain(gain));
         mLabelGainValue.setText(String.valueOf(gain));
+    }
+
+    public void setSwipe(float swipe) {
+        mSeekBarSwipe.setProgress(SettingsHelper.revertSwipe(swipe));
+        mLabelSwipeValue.setText(String.valueOf(swipe));
     }
 
     public void updateState(int state) {
@@ -210,6 +245,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         setCalibrationValues();
         setCurrent(mSettingsControlCallback.getCurrent());
         setGain(mSettingsControlCallback.getGain());
+        setSwipe(mSettingsControlCallback.getSwipe());
         setDataRateValue(mSettingsControlCallback.getDataHighRate(),mSettingsControlCallback.getDataLowRate());
     }
 
@@ -221,10 +257,13 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public void onCalibrateClick();
         public void onSetCurrentClick();
         public void onSetGainClick();
+        public void onSetSwipeClick();
         public void onSetCurrent(float current);
         public void onSetGain(float gain);
+        public void onSetSwipe(float swipe);
         public void onResetCurrentClick();
         public void onResetGainClick();
+        public void onResetSwipeClick();
         public void onEmissionClick();
 
         public void onGUIPause();
@@ -236,6 +275,7 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         public float getRemoteMaxCurrent();
         public float getCurrent();
         public float getGain();
+        public float getSwipe();
         public float getDataHighRate();
         public float getDataLowRate();
 

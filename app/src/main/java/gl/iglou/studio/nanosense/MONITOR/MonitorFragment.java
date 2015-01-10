@@ -193,7 +193,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
             float derivate = smoothDerivateData();
             updateSerie(SERIE_SECONDARY,derivate);
 
-            if(Math.abs(derivate) > 5) {
+            if(Math.abs(derivate) > mSettingsControlCallback.getSwipe()) {
                 if(System.currentTimeMillis() - mLastTrigger > mMinTimeElapsed) {
                     mMPCallback.onNextClick();
                     mLastTrigger = System.currentTimeMillis();
