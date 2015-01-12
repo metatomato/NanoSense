@@ -22,14 +22,13 @@
 
             <FrameLayout
                 android:id="@+id/launcher"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/content_drawer_detail"
                 android:layout_height="match_parent"
-                android:background="@color/white_solid"
-                android:text="oYo!!">
+                android:background="@color/white_solid">
 
                 <fragment
                     android:id="@+id/launcher_compact"
-                    android:layout_width="@dimen/content_drawer_offset"
+                    android:layout_width="@dimen/content_drawer_compact"
                     android:layout_height="match_parent"
                     android:name="gl.iglou.studio.nanosense.LauncherCompactFragment"
                 />
@@ -39,7 +38,7 @@
             <FrameLayout
                 android:id="@+id/main_content"
                 android:layout_marginLeft="@dimen/content_drawer_offset"
-                android:layout_width="520dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white_solid"
                 android:name="gl.iglou.studio.nanosense.NanoSenseActivity$PlaceholderFragment"

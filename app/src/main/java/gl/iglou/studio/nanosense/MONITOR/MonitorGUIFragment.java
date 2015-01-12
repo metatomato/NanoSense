@@ -1,6 +1,7 @@
 package gl.iglou.studio.nanosense.MONITOR;
 
 
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -10,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.androidplot.ui.AnchorPosition;
+import com.androidplot.ui.XLayoutStyle;
+import com.androidplot.ui.YLayoutStyle;
 import com.androidplot.xy.*;
 
 import gl.iglou.studio.nanosense.NanoSenseActivity;
@@ -104,6 +108,23 @@ public class MonitorGUIFragment extends Fragment {
 
         mPrimaryPlot.setRangeBoundaries(1.0, 5.0, BoundaryMode.FIXED);
         //mSecondaryPlot.setRangeBoundaries(-20.0, 20.0, BoundaryMode.FIXED);
+
+        mPrimaryPlot.getBackgroundPaint().setColor(getResources().getColor(R.color.color_primary));
+        mPrimaryPlot.getGraphWidget().getGridBackgroundPaint().setColor(Color.YELLOW);
+        mPrimaryPlot.getGraphWidget().getBackgroundPaint().setColor(Color.BLUE);
+
+        mPrimaryPlot.setPlotPadding(30, 30, 30, 30);
+
+        mPrimaryPlot.getLayoutManager()
+                .remove(mPrimaryPlot.getLegendWidget());
+
+        mPrimaryPlot.getDomainLabelWidget().position(450, XLayoutStyle.ABSOLUTE_FROM_LEFT,
+                50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM,
+                AnchorPosition.LEFT_BOTTOM);
+
+        mPrimaryPlot.getRangeLabelWidget().position(50, XLayoutStyle.ABSOLUTE_FROM_LEFT,
+                500, YLayoutStyle.ABSOLUTE_FROM_BOTTOM,
+                AnchorPosition.LEFT_BOTTOM);
 
         return rootView;
     }

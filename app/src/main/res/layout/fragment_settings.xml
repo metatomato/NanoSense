@@ -32,7 +32,7 @@
             android:background="@color/color_secondary"
             android:textColor="@color/white_solid"
             android:textSize="20sp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/top_margin_large"
             android:layout_below="@+id/btn_emission_control"
             android:layout_alignParentStart="true"
             android:paddingLeft="10dp" />
@@ -46,8 +46,8 @@
             android:background="@color/color_secondary"
             android:textColor="@color/white_solid"
             android:textSize="20sp"
-            android:layout_marginTop="30dp"
-            android:layout_below="@+id/btn_calibrate"
+            android:layout_marginTop="@dimen/top_margin"
+            android:layout_below="@+id/linearLayout_frame_value"
             android:layout_centerHorizontal="true"
             android:paddingLeft="10dp" />
 
@@ -60,7 +60,7 @@
             android:background="@color/color_secondary"
             android:textColor="@color/white_solid"
             android:textSize="20sp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/top_margin_large"
             android:layout_centerHorizontal="true"
             android:paddingLeft="10dp"
             android:layout_below="@+id/relativeLayout_gain" />
@@ -73,12 +73,13 @@
             android:id="@+id/label_state"
             android:layout_alignTop="@+id/btn_emission_control"
             android:layout_alignParentStart="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="15dp" />
+            android:layout_marginLeft="@dimen/left_margin"
+            android:layout_marginTop="@dimen/top_margin"
+            android:textSize="@dimen/font_size" />
 
         <Button
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/btn_emission_control_size"
+            android:layout_height="@dimen/btn_emission_control_size"
             android:text="@string/btn_start"
             android:id="@+id/btn_emission_control"
             android:background="@drawable/circle"
@@ -86,9 +87,9 @@
             android:textColor="@color/white_solid"
             android:layout_below="@+id/label_connection"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="30dp"
-            android:layout_marginRight="60dp"
-            android:textSize="20dp"
+            android:layout_marginTop="@dimen/top_margin"
+            android:layout_marginRight="@dimen/right_margin_large"
+            android:textSize="@dimen/font_size"
             android:elevation="@dimen/btn_elevation"/>
 
         <TextView
@@ -99,7 +100,8 @@
             android:id="@+id/label_state_value"
             android:layout_alignTop="@+id/label_state"
             android:layout_toEndOf="@+id/label_state"
-            android:layout_marginLeft="60dp" />
+            android:textSize="@dimen/font_size"
+            android:layout_alignLeft="@+id/label_receiving_value" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -110,7 +112,8 @@
             android:layout_below="@+id/label_state"
             android:layout_alignParentStart="true"
             android:layout_marginTop="30dp"
-            android:layout_marginLeft="15dp" />
+            android:layout_marginLeft="15dp"
+            android:textSize="@dimen/font_size" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -119,25 +122,23 @@
             android:text="NONE"
             android:id="@+id/label_receiving_value"
             android:layout_alignTop="@+id/label_receiving"
-            android:layout_alignStart="@+id/label_state_value" />
+            android:textSize="@dimen/font_size"
+            android:layout_toRightOf="@+id/label_receiving"
+            android:layout_marginLeft="@dimen/left_margin" />
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="120dp"
-            android:layout_marginTop="30dp"
+            android:layout_width="@dimen/frame_value_size"
+            android:layout_height="@dimen/frame_value_size"
+            android:layout_marginTop="@dimen/top_margin"
             android:background="@drawable/border_rect"
-            android:layout_marginLeft="60dp"
-            android:layout_marginRight="90dp"
+            android:layout_marginRight="@dimen/right_margin_xlarge"
             android:gravity="center_horizontal"
-            android:paddingTop="30dp"
-            android:paddingBottom="15dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
             android:layout_below="@+id/label_calibration"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentEnd="false"
             android:layout_alignParentRight="true"
-            android:id="@+id/linearLayout">
+            android:id="@+id/linearLayout_frame_value"
+            android:layout_alignParentStart="false">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -145,7 +146,9 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/label_resistance"
                 android:id="@+id/label_resistance"
-                android:textColor="@color/color_tertiary" />
+                android:textColor="@color/color_tertiary"
+                android:textSize="@dimen/font_size"
+                android:layout_marginTop="@dimen/frame_top_margin" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -153,22 +156,23 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/label_current"
                 android:id="@+id/label_current"
-                android:layout_marginTop="15dp"
-                android:textColor="@color/color_tertiary" />
+                android:layout_marginTop="@dimen/top_margin"
+                android:textColor="@color/color_tertiary"
+                android:textSize="@dimen/font_size" />
         </LinearLayout>
 
         <Button
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="@dimen/btn_emission_control_size"
+            android:layout_height="@dimen/btn_emission_control_size"
             android:text="@string/btn_calibrate"
             android:id="@+id/btn_calibrate"
             android:background="@drawable/circle"
             android:stateListAnimator="@animator/button_elevation"
             android:textColor="@color/white_solid"
-            android:textSize="20dp"
-            android:layout_marginLeft="90dp"
-            android:layout_alignTop="@+id/linearLayout"
-            android:layout_alignParentStart="true"
+            android:textSize="@dimen/font_size"
+            android:layout_marginLeft="@dimen/left_margin_xlarge"
+            android:layout_alignTop="@+id/linearLayout_frame_value"
+            android:layout_alignParentStart="false"
             android:layout_alignParentLeft="true"
             android:elevation="@dimen/btn_elevation"/>
 
@@ -183,7 +187,7 @@
             android:background="@color/color_secondary_alpha">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="reset"
                 android:id="@+id/btn_current_reset"
@@ -192,7 +196,8 @@
                 android:background="@color/color_secondary"
                 android:textColor="@color/white_solid"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/font_size_small" />
 
             <SeekBar
                 android:layout_width="360dp"
@@ -216,10 +221,11 @@
                 android:id="@+id/label_current_value"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/btn_set_current"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/font_size" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="Set Current"
                 android:id="@+id/btn_set_current"
@@ -230,7 +236,8 @@
                 android:paddingRight="5dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:textSize="@dimen/font_size_small" />
         </RelativeLayout>
 
         <TextView
@@ -241,10 +248,11 @@
             android:id="@+id/label_current_section"
             android:layout_below="@+id/label_settings"
             android:layout_alignParentStart="false"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/top_margin"
             android:textColor="@color/color_secondary"
             android:layout_marginBottom="5dp"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/font_size" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -254,10 +262,11 @@
             android:id="@+id/label_gain_section"
             android:layout_below="@+id/relativeLayout_current"
             android:layout_alignParentStart="false"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="@dimen/top_margin"
             android:textColor="@color/color_primary"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="5dp"
+            android:textSize="@dimen/font_size" />
 
         <RelativeLayout
             android:orientation="horizontal"
@@ -270,7 +279,7 @@
             android:layout_centerHorizontal="true">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="reset"
                 android:id="@+id/btn_gain_reset"
@@ -279,7 +288,8 @@
                 android:background="@color/color_primary"
                 android:textColor="@color/white_solid"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/font_size_small" />
 
             <SeekBar
                 android:layout_width="360dp"
@@ -303,10 +313,11 @@
                 android:id="@+id/label_gain_value"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/btn_set_gain"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/font_size" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="Set Gain"
                 android:id="@+id/btn_set_gain"
@@ -317,7 +328,8 @@
                 android:paddingRight="5dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:textSize="@dimen/font_size_small" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -329,12 +341,12 @@
             android:background="@color/color_tertiary_alpha"
             android:layout_alignParentTop="false"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="31dp"
+            android:layout_marginTop="@dimen/top_margin"
             android:layout_below="@+id/label_swipe"
             android:clickable="true">
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="reset"
                 android:id="@+id/btn_swipe_reset"
@@ -343,7 +355,8 @@
                 android:background="@color/color_tertiary"
                 android:textColor="@color/white_solid"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/font_size_small" />
 
             <SeekBar
                 android:layout_width="360dp"
@@ -367,10 +380,11 @@
                 android:id="@+id/label_swipe_value"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/btn_set_swipe"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/font_size" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
                 android:text="Set Swipe"
                 android:id="@+id/btn_set_swipe"
@@ -381,7 +395,8 @@
                 android:paddingRight="5dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="false"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:textSize="@dimen/font_size_small" />
         </RelativeLayout>
     </RelativeLayout>
 </ScrollView>

@@ -42,7 +42,6 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     private BTControlCallback mCallback;
 
     private Button mButtonConnectRemote;
-    private Button mButtonCalibrate;
     private Switch mSwitchAdapter;
     private Switch mSwitchDiscover;
     private TextView mLabelConenctionState;
@@ -78,8 +77,6 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
         mButtonConnectRemote = (Button) rootView.findViewById(R.id.btn_start_stop);
 
-        mButtonCalibrate = (Button) rootView.findViewById(R.id.btn_dummy);
-
         return rootView;
     }
 
@@ -95,13 +92,6 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
             @Override
             public void onClick(View v) {
                 mCallback.onConnectClick();
-            }
-        });
-
-        mButtonCalibrate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mCallback.onCalibrateClick();
             }
         });
 

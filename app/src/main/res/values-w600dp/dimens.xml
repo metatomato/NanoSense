@@ -6,7 +6,7 @@
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
     <dimen name="navigation_drawer_width">80dp</dimen>
-    <dimen name="content_drawer_offset">0dp</dimen>
+    <dimen name="content_drawer_offset">80dp</dimen>
     <dimen name="content_drawer_detail">80dp</dimen>
     <dimen name="content_drawer_compact">80dp</dimen>
     <dimen name="launcher_icon">56dp</dimen>
@@ -24,40 +24,33 @@
     <dimen name="legend_text_font_size">20dp</dimen>
 
 
-
     <!-- COMMON FRAG DIMEN -->
-    <dimen name="font_size_small">10sp</dimen>
-    <dimen name="font_size">15sp</dimen>
-    <dimen name="top_margin">15dp</dimen>
-    <dimen name="top_margin_large">30dp</dimen>
-    <dimen name="right_margin">15dp</dimen>
-    <dimen name="right_margin_large">30dp</dimen>
-    <dimen name="right_margin_xlarge">45dp</dimen>
-    <dimen name="left_margin">15dp</dimen>
-    <dimen name="left_margin_large">30dp</dimen>
-    <dimen name="left_margin_xlarge">45dp</dimen>
-
+    <dimen name="font_size_small">15sp</dimen>
+    <dimen name="font_size">20sp</dimen>
+    <dimen name="top_margin">30dp</dimen>
+    <dimen name="top_margin_large">45dp</dimen>
+    <dimen name="right_margin">30dp</dimen>
+    <dimen name="right_margin_large">45dp</dimen>
+    <dimen name="right_margin_xlarge">90dp</dimen>
+    <dimen name="left_margin">30dp</dimen>
+    <dimen name="left_margin_xlarge">90dp</dimen>
 
     <!-- MP_FRAG DIMEN -->
-    <dimen name="imageView_album_art_size">260dp</dimen>
-    <dimen name="imageView_album_art_top_margin">30dp</dimen>
-    <dimen name="btn_play_size">140dp</dimen>
-    <dimen name="btn_play_top_margin">30dp</dimen>
-    <dimen name="btn_next_size">80dp</dimen>
-    <dimen name="btn_next_top_margin">80dp</dimen>
+    <dimen name="imageView_album_art_size">320dp</dimen>
+    <dimen name="imageView_album_art_top_margin">80dp</dimen>
+    <dimen name="btn_play_size">180dp</dimen>
+    <dimen name="btn_play_top_margin">60dp</dimen>
+    <dimen name="btn_next_size">120dp</dimen>
+    <dimen name="btn_next_top_margin">70dp</dimen>
 
     <!-- BT_FRAG DIMEN -->
-    <dimen name="bt_btn_start_stop_size">140dp</dimen>
-    <dimen name="bt_btn_start_stop_top_margin">15dp</dimen>
+    <dimen name="bt_btn_start_stop_size">160dp</dimen>
+    <dimen name="bt_btn_start_stop_top_margin">120dp</dimen>
 
     <!-- SETTINGS_FRAG DIMEN -->
-    <dimen name="btn_emission_control_size">100dp</dimen>
-    <dimen name="btn_seekbar_size">60dp</dimen>
-    <dimen name="frame_value_size">100dp</dimen>
-    <dimen name="frame_top_margin">25dp</dimen>
-
-
-
-
+    <dimen name="btn_emission_control_size">120dp</dimen>
+    <dimen name="btn_seekbar_size">90dp</dimen>
+    <dimen name="frame_value_size">140dp</dimen>
+    <dimen name="frame_top_margin">35dp</dimen>
 
 </resources>
