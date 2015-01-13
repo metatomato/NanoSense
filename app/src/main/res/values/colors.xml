@@ -2,6 +2,9 @@
 <resources>
     <item name="white_solid" type="color">#ffffff</item>
     <item name="green_solid" type="color">#00ff00</item>
+    <item name="black_solid" type="color">#000000</item>
+    <item name="gray_solid" type="color">#888888</item>
+    <item name="gray_dark_solid" type="color">#444444</item>
     <item name="black_alpha" type="color">#80000000</item>
     <item name="black_alpha_light" type="color">#18000000</item>
     <item name="color_primary" type="color">#7cbf4c</item>

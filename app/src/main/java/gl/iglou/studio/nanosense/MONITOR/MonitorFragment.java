@@ -268,7 +268,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
     private void updateSerie(int serieId, Number Y) {
        SimpleXYSeries currentSerie = getSerie(serieId);
         currentSerie.removeFirst();
-        Number lastX = currentSerie.getX(currentSerie.size() - 1 ).doubleValue() + MonitorGUIFragment.PLOT_INITIAL_STEP;
+        Number lastX = currentSerie.getX(currentSerie.size() - 1 ).doubleValue() + MonitorGUIFragment.PLOT_INITIAL_STEP / 1000.f;
         currentSerie.addLast(lastX, Y);
         //Log.d(TAG,"X: " + String.valueOf(X) + "     Y: " + String.valueOf(Y));
     }

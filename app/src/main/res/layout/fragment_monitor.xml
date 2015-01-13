@@ -6,7 +6,7 @@
     <com.androidplot.xy.XYPlot
         android:id="@+id/primary_plot"
         android:layout_width="fill_parent"
-        android:layout_height="400dp"
+        android:layout_height="fill_parent"
 
         android:paddingLeft="60dp"
 
@@ -15,10 +15,16 @@
         androidPlot.domainLabelWidget.labelPaint.textSize="@dimen/domain_label_font_size"
         androidPlot.rangeLabelWidget.labelPaint.textSize="@dimen/range_label_font_size"
 
-        androidPlot.graphWidget.marginTop="30dp"
-        androidPlot.graphWidget.marginLeft="30dp"
-        androidPlot.graphWidget.marginBottom="60dp"
-        androidPlot.graphWidget.marginRight="30dp"
+        androidPlot.domainLabelWidget.labelPaint.color="@color/gray_solid"
+        androidPlot.rangeLabelWidget.labelPaint.color="@color/gray_solid"
+        androidPlot.graphWidget.rangeLabelPaint.color="@color/gray_solid"
+        androidPlot.graphWidget.domainLabelPaint.color="@color/gray_solid"
+
+
+        androidPlot.graphWidget.marginTop="11dp"
+        androidPlot.graphWidget.marginLeft="15dp"
+        androidPlot.graphWidget.marginBottom="30dp"
+        androidPlot.graphWidget.marginRight="5dp"
 
 
         androidPlot.graphWidget.rangeLabelPaint.textSize="@dimen/range_tick_label_font_size"
@@ -28,9 +34,8 @@
         androidPlot.graphWidget.domainOriginLabelPaint.textSize="@dimen/domain_tick_label_font_size"
 
 
-        androidPlot.graphWidget.gridLinePaint.color="#000000"
-        android:layout_marginTop="30dp" />
-
+        androidPlot.graphWidget.gridLinePaint.color="#000000" />
+<!--
     <com.androidplot.xy.XYPlot
         android:id="@+id/secondary_plot"
         android:layout_width="fill_parent"
@@ -57,7 +62,7 @@
         androidPlot.graphWidget.gridLinePaint.color="#000000"
         android:layout_below="@+id/primary_plot"
         android:layout_marginTop="30dp" />
-
+-->
     <Button
         android:id="@+id/btn_start_stop"
         android:layout_width="100dp"

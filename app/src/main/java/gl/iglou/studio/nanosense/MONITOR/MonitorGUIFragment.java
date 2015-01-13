@@ -72,7 +72,7 @@ public class MonitorGUIFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_monitor,container,false);
 
         mPrimaryPlot = (XYPlot) rootView.findViewById(R.id.primary_plot);
-        mSecondaryPlot = (XYPlot) rootView.findViewById(R.id.secondary_plot);
+        //mSecondaryPlot = (XYPlot) rootView.findViewById(R.id.secondary_plot);
         mStartStopBtn = (Button) rootView.findViewById(R.id.btn_start_stop);
 
         mStartStopBtn.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +100,7 @@ public class MonitorGUIFragment extends Fragment {
 
         // add a new series' to the xyplot:
         mPrimaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_PRIMARY), series1Format);
-        mSecondaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_SECONDARY), series1Format);
+       // mSecondaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_SECONDARY), series1Format);
 
         // reduce the number of range labels
         mPrimaryPlot.setTicksPerRangeLabel(3);
@@ -109,21 +109,23 @@ public class MonitorGUIFragment extends Fragment {
         mPrimaryPlot.setRangeBoundaries(1.0, 5.0, BoundaryMode.FIXED);
         //mSecondaryPlot.setRangeBoundaries(-20.0, 20.0, BoundaryMode.FIXED);
 
-        mPrimaryPlot.getBackgroundPaint().setColor(getResources().getColor(R.color.color_primary));
-        mPrimaryPlot.getGraphWidget().getGridBackgroundPaint().setColor(Color.YELLOW);
-        mPrimaryPlot.getGraphWidget().getBackgroundPaint().setColor(Color.BLUE);
+        mPrimaryPlot.getBackgroundPaint().setColor(Color.WHITE);
+        mPrimaryPlot.getGraphWidget().getGridBackgroundPaint().setColor(getResources().getColor(R.color.color_secondary));
+        mPrimaryPlot.getGraphWidget().getBackgroundPaint().setColor(Color.WHITE);
 
         mPrimaryPlot.setPlotPadding(30, 30, 30, 30);
 
         mPrimaryPlot.getLayoutManager()
                 .remove(mPrimaryPlot.getLegendWidget());
 
-        mPrimaryPlot.getDomainLabelWidget().position(450, XLayoutStyle.ABSOLUTE_FROM_LEFT,
-                50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM,
+        mPrimaryPlot.getDomainLabelWidget().position(0, XLayoutStyle.RELATIVE_TO_CENTER,
+                0, YLayoutStyle.ABSOLUTE_FROM_BOTTOM,
                 AnchorPosition.LEFT_BOTTOM);
 
-        mPrimaryPlot.getRangeLabelWidget().position(50, XLayoutStyle.ABSOLUTE_FROM_LEFT,
-                500, YLayoutStyle.ABSOLUTE_FROM_BOTTOM,
+       // mPrimaryPlot.getDomainLabelWidget().getLabelPaint().setColor(Color.YELLOW);
+
+        mPrimaryPlot.getRangeLabelWidget().position(0, XLayoutStyle.ABSOLUTE_FROM_LEFT,
+                0, YLayoutStyle.RELATIVE_TO_CENTER,
                 AnchorPosition.LEFT_BOTTOM);
 
         return rootView;
@@ -136,7 +138,7 @@ public class MonitorGUIFragment extends Fragment {
             @Override
             public void run() {
                 mPrimaryPlot.redraw();
-                mSecondaryPlot.redraw();
+               // mSecondaryPlot.redraw();
                 mPlotScheduler.postDelayed(this,100L);
             }
         };
