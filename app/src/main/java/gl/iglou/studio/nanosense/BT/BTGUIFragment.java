@@ -143,6 +143,13 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
 
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        updateRemote(false);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_bt_frag,menu);

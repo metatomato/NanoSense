@@ -47,8 +47,8 @@
     <dimen name="btn_next_top_margin">80dp</dimen>
 
     <!-- BT_FRAG DIMEN -->
-    <dimen name="bt_btn_start_stop_size">140dp</dimen>
-    <dimen name="bt_btn_start_stop_top_margin">15dp</dimen>
+    <dimen name="bt_btn_start_stop_size">120dp</dimen>
+    <dimen name="bt_btn_start_stop_top_margin">30dp</dimen>
 
     <!-- SETTINGS_FRAG DIMEN -->
     <dimen name="btn_emission_control_size">100dp</dimen>

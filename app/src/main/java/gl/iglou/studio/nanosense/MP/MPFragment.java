@@ -66,8 +66,10 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        checkFileSystem(MEDIA_PATH);
-        ParseFileSystem();
+        if(isExternalStorageWritable()) {
+            checkFileSystem(MEDIA_PATH);
+            ParseFileSystem();
+        }
 
         mMetaRetriver = new MediaMetadataRetriever();
 
@@ -77,6 +79,16 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
     public void setMPGUIFrag(MPGUIFragment frag) {
         mMPGUIFragment = frag;
     }
+
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
 
     public void checkFileSystem(String root_path)
     {

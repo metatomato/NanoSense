@@ -1,16 +1,21 @@
 package gl.iglou.studio.nanosense;
 
 import android.graphics.Color;
+import android.os.Build;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
+import android.view.WindowManager;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
 import gl.iglou.studio.nanosense.BT.BTGUIFragment;
@@ -53,6 +58,8 @@ public class NanoSenseActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nano_sense);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         mFragmentLabel = new String[4];
         mFragmentLabel[0] = getResources().getString(R.string.fragment_label_mp);
         mFragmentLabel[1] = getResources().getString(R.string.fragment_label_bt);
@@ -68,13 +75,27 @@ public class NanoSenseActivity extends ActionBarActivity {
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
 
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        Log.v(TAG,"X: " + String.valueOf(dpWidth) + "   Y: " + String.valueOf(dpHeight));
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if(dpWidth >= 600.0) {
+                mContentView.setBackgroundDrawable(getResources().getDrawable(R.drawable.drawer_shadow_reverse));
+                mContentView.setPadding(Math.round(5 * displayMetrics.density),0,0,0);
+            } else {
+                mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
+            }
+        }
+
         if (mToolbar  != null) {
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
-
-        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(
                 this,

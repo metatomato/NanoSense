@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "gl.iglou.studio.nanosense"
-        minSdkVersion 21
-        targetSdkVersion 21
+        minSdkVersion 15
+        targetSdkVersion 15
         versionCode 1
         versionName "1.0"
     }

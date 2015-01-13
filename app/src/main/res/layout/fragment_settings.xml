@@ -23,6 +23,24 @@
             android:textSize="20sp"
             android:paddingLeft="10dp" />
 
+        <Button
+            android:layout_width="@dimen/btn_emission_control_size"
+            android:layout_height="@dimen/btn_emission_control_size"
+            android:text="@string/btn_start"
+            android:id="@+id/btn_emission_control"
+            android:background="@drawable/circle"
+            android:stateListAnimator="@animator/button_elevation"
+            android:textColor="@color/white_solid"
+            android:textSize="@dimen/font_size"
+            android:elevation="@dimen/btn_elevation"
+            android:layout_alignParentLeft="false"
+            android:layout_below="@+id/label_connection"
+            android:layout_marginTop="@dimen/top_margin"
+            android:layout_marginRight="@dimen/right_margin_large"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentRight="true" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,26 +89,11 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="State:"
             android:id="@+id/label_state"
-            android:layout_alignTop="@+id/btn_emission_control"
             android:layout_alignParentStart="true"
             android:layout_marginLeft="@dimen/left_margin"
-            android:layout_marginTop="@dimen/top_margin"
-            android:textSize="@dimen/font_size" />
-
-        <Button
-            android:layout_width="@dimen/btn_emission_control_size"
-            android:layout_height="@dimen/btn_emission_control_size"
-            android:text="@string/btn_start"
-            android:id="@+id/btn_emission_control"
-            android:background="@drawable/circle"
-            android:stateListAnimator="@animator/button_elevation"
-            android:textColor="@color/white_solid"
-            android:layout_below="@+id/label_connection"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="@dimen/top_margin"
-            android:layout_marginRight="@dimen/right_margin_large"
+            android:layout_marginTop="@dimen/top_margin_large"
             android:textSize="@dimen/font_size"
-            android:elevation="@dimen/btn_elevation"/>
+            android:layout_below="@+id/label_connection" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -189,7 +192,7 @@
             <Button
                 android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
-                android:text="reset"
+                android:text="Reset"
                 android:id="@+id/btn_current_reset"
                 android:layout_alignParentRight="false"
                 android:clickable="false"
@@ -281,7 +284,7 @@
             <Button
                 android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
-                android:text="reset"
+                android:text="Reset"
                 android:id="@+id/btn_gain_reset"
                 android:layout_alignParentRight="false"
                 android:clickable="false"
@@ -348,7 +351,7 @@
             <Button
                 android:layout_width="@dimen/btn_seekbar_size"
                 android:layout_height="match_parent"
-                android:text="reset"
+                android:text="Reset"
                 android:id="@+id/btn_swipe_reset"
                 android:layout_alignParentRight="false"
                 android:clickable="false"

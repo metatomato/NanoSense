@@ -2,6 +2,7 @@ package gl.iglou.studio.nanosense;
 
 import android.app.Fragment;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -53,7 +54,7 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
 
             ((ImageView)rocket).getDrawable().setLevel(1);
         }
-
+    //oyo
         updateRockets(mActiveRocket);
     }
 
@@ -106,10 +107,19 @@ public class LauncherCompactFragment extends Fragment implements View.OnClickLis
         ImageView rocket = (ImageView) v;
         if(rocket != null) {
             if(activated) {
-                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_ACTIVE));
-                rocket.setBackground(getResources().getDrawable(R.drawable.round_rect));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_ACTIVE));
+                }
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    rocket.setBackground(getResources().getDrawable(R.drawable.round_rect));
+                } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                    rocket.setBackgroundDrawable(getResources().getDrawable(R.drawable.round_rect));
+                }
             } else {
-                rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_PASSIVE));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    rocket.getDrawable().setTint(getResources().getColor(ROCKET_TINT_PASSIVE));
+                }
+
                 rocket.setBackgroundColor(getResources().getColor(R.color.white_solid));
             }
         }

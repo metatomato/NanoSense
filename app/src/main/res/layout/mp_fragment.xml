@@ -37,10 +37,10 @@
         android:layout_marginTop="@dimen/btn_next_top_margin"
         android:background="@drawable/circle"
         android:layout_alignTop="@+id/btn_play"
-        android:layout_toEndOf="@+id/btn_play"
         android:textColor="@color/white_solid"
         android:textSize="20sp"
-        android:contentDescription="next_btn" />
+        android:contentDescription="next_btn"
+        android:layout_toRightOf="@+id/btn_play" />
 
     <Button
         android:layout_width="@dimen/btn_next_size"
@@ -52,6 +52,7 @@
         android:layout_toStartOf="@+id/btn_play"
         android:textColor="@color/white_solid"
         android:textSize="20sp"
-        android:contentDescription="prev_btn" />
+        android:contentDescription="prev_btn"
+        android:layout_toLeftOf="@+id/btn_play" />
 
 </RelativeLayout>
