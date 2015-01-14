@@ -334,6 +334,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     setState(msg.arg1);
                     break;
                 case MESSAGE_WRITE:
+                    String sendMsg = BTDataConverter.decodeMessage((byte[])msg.obj,"UTF_8");
+                    Log.d(TAG, "WRITE " + sendMsg);
+                    if(sendMsg.startsWith("K")) {
+                        Log.d(TAG, "CALIBRATION!");
+                    }
                     Log.d(TAG, "MESSAGE_WRITE");
                     break;
                 case MESSAGE_READ:
@@ -367,9 +372,6 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                             mData = "";
                         }
                     }
-
-
-
 
                     break;
                 case MESSAGE_TOAST:

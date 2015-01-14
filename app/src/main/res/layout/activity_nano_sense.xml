@@ -58,10 +58,10 @@
              the container. -->
         <FrameLayout
             android:id="@+id/navigation_drawer"
-            android:paddingRight="5dp"
             android:layout_width="@dimen/navigation_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="left"
+            android:background="@drawable/drawer_shadow_reverse"
         />
 
     </android.support.v4.widget.DrawerLayout>

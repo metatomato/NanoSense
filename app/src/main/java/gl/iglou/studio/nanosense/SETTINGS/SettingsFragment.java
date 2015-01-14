@@ -67,6 +67,9 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     private int mCalculatedCurrent;
     private int mCalculatedGain;
 
+    private boolean mWaitingForCalibrationFeedback = false;
+    private float mCalibrationResistance = 0.f;
+    private float mCalibrationCurrent = 0.f;
 
     //DataRate Processing Vars
     private Handler mDataRateScheduler;
@@ -122,8 +125,12 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
                             break;
                         case BTFragment.EXTRA_CAT_SENSOR_DATA:
                             float value = intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f);
-                            mHighFrequencyData.add(value);
-                            mLowFrequencyData.add(value);
+                            if(mWaitingForCalibrationFeedback) {
+                                updateCalibrationValues(value);
+                            } else {
+                                mHighFrequencyData.add(value);
+                                mLowFrequencyData.add(value);
+                            }
                             break;
                     }
                     break;
@@ -228,8 +235,21 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         }
     }
 
+    private void updateCalibrationValues(float resistance) {
+        mCalibrationResistance = resistance;
+        calculateCalibrationCurrent();
+        mWaitingForCalibrationFeedback = false;
+        Log.d(TAG,"Resistance: " + String.valueOf(mCalibrationResistance) + "   current: "
+                + String.valueOf(mCalibrationCurrent) );
+    }
+
+    private void calculateCalibrationCurrent() {
+        mCalibrationCurrent = 22.f / mCalibrationResistance;
+    }
+
 //SettingsControlCallback Impelmentation
     public void onCalibrateClick() {
+        mWaitingForCalibrationFeedback = true;
         mMessagingManager.sendMessage(MSG_CALIBRATE);
     }
 

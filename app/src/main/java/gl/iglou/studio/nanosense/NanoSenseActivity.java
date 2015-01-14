@@ -1,7 +1,9 @@
 package gl.iglou.studio.nanosense;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Fragment;
@@ -9,6 +11,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -53,6 +56,10 @@ public class NanoSenseActivity extends ActionBarActivity {
     private SettingsGUIFragment mSettingsGUIFragment;
     private MonitorGUIFragment mMonitorGUIFragment;
 
+    private DisplayMetrics mDisplayMetrics;
+    private float mDpHeight;
+    private float mDpWidth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,21 +82,10 @@ public class NanoSenseActivity extends ActionBarActivity {
 
         mDrawerLayout.setScrimColor(Color.TRANSPARENT);
 
-        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        mDisplayMetrics = this.getResources().getDisplayMetrics();
 
-        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
-        Log.v(TAG,"X: " + String.valueOf(dpWidth) + "   Y: " + String.valueOf(dpHeight));
-
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            if(dpWidth >= 600.0) {
-                mContentView.setBackgroundDrawable(getResources().getDrawable(R.drawable.drawer_shadow_reverse));
-                mContentView.setPadding(Math.round(5 * displayMetrics.density),0,0,0);
-            } else {
-                mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
-            }
-        }
+        mDpHeight = mDisplayMetrics.heightPixels / mDisplayMetrics.density;
+        mDpWidth = mDisplayMetrics.widthPixels / mDisplayMetrics.density;
 
         if (mToolbar  != null) {
             setSupportActionBar(mToolbar);
@@ -133,36 +129,45 @@ public class NanoSenseActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
-
         //Start BTFragment
         FragmentManager fm = getFragmentManager();
         if(mBTFragment == null) {
             mBTFragment = new BTFragment();
             fm.beginTransaction().add(mBTFragment, "BTFrag").commit();
         }
-
         //Start SettingsFragment
         if(mSettingsFragment == null) {
             mSettingsFragment = new SettingsFragment();
             fm.beginTransaction().add(mSettingsFragment, "SettingsFrag").commit();
         }
-
         //Start MPFragment
         if(mMPFragment == null) {
             mMPFragment = new MPFragment();
             fm.beginTransaction().add(mMPFragment, "MPFrag").commit();
         }
-
         //Start MonitorFragment
         if(mMonitorFragment == null) {
             mMonitorFragment = new MonitorFragment();
             fm.beginTransaction().add(mMonitorFragment, "MonitorFrag").commit();
         }
-
-
         contentViewResolver(MP_FRAGMENT);
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            if(mDpWidth >= 600.0) {
+                mNavigationDrawer.setBackgroundResource(0);
+                mContentView.setBackgroundDrawable(getResources().getDrawable(R.drawable.drawer_shadow_reverse_left));
+                mContentView.setPadding(Math.round(5 * mDisplayMetrics.density),0,0,0);
+            } else {
+                //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
+            }
+        }
+    }
 
     public void contentViewResolver(int fragmentId) {
         FragmentManager fragmentManager = getFragmentManager();
