@@ -111,7 +111,7 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
                         case BTFragment.EXTRA_CAT_CALIBRATION:
                             break;
                         case BTFragment.EXTRA_CAT_SENSOR_DATA:
-                            float value = (intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f));
+                            float value = (intent.getFloatExtra(BTFragment.EXTRA_DATA_FEEDBACK, 0.f));
                             //processData(value);
                             break;
                     }

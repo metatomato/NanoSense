@@ -6,10 +6,15 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.androidplot.ui.AnchorPosition;
 import com.androidplot.ui.XLayoutStyle;
@@ -27,6 +32,8 @@ public class MonitorGUIFragment extends Fragment {
 
     private static final String TAG = "MonitorFragment";
     private XYPlot mPrimaryPlot;
+    private int mCurrentSerie = MonitorFragment.SERIE_PRIMARY;
+    private LineAndPointFormatter mSeries1Format;
     private XYPlot mSecondaryPlot;
     private Button mStartStopBtn;
     private MonitorControlCallback mMonitorControlCallback;
@@ -47,6 +54,7 @@ public class MonitorGUIFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
         mMonitorControlCallback = ((NanoSenseActivity)getActivity()).getMonitorController();
     }
 
@@ -93,13 +101,13 @@ public class MonitorGUIFragment extends Fragment {
 
         // Create a formatter to use for drawing a series using LineAndPointRenderer
         // and configure it from xml:
-        LineAndPointFormatter series1Format = new LineAndPointFormatter();
-        series1Format.setPointLabelFormatter(new PointLabelFormatter());
-        series1Format.configure(getActivity().getApplicationContext(),
+        mSeries1Format = new LineAndPointFormatter();
+        mSeries1Format.setPointLabelFormatter(new PointLabelFormatter());
+        mSeries1Format.configure(getActivity().getApplicationContext(),
                 R.xml.line_point_formatter_with_plf2);
 
         // add a new series' to the xyplot:
-        mPrimaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_PRIMARY), series1Format);
+        mPrimaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_PRIMARY), mSeries1Format);
        // mSecondaryPlot.addSeries(mMonitorControlCallback.getData(MonitorFragment.SERIE_SECONDARY), series1Format);
 
         // reduce the number of range labels
@@ -131,6 +139,26 @@ public class MonitorGUIFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_monitor_frag,menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.switch_plot:
+                Toast.makeText(getActivity().getApplicationContext(), "SWITCH PLOT", Toast.LENGTH_SHORT)
+                        .show();
+                switchSerie();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private void launchPlotScheduler() {
         mPlotScheduler = new Handler();
@@ -148,6 +176,25 @@ public class MonitorGUIFragment extends Fragment {
 
     public void updateExtrema(float yMin, float yMax) {
         mPrimaryPlot.setRangeBoundaries(yMin, yMax, BoundaryMode.AUTO);
+    }
+
+
+    public void switchSerie() {
+        if(mCurrentSerie == MonitorFragment.SERIE_PRIMARY) {
+            setSerie(MonitorFragment.SERIE_SECONDARY);
+            mPrimaryPlot.setRangeBoundaries(-10.0, 10.0, BoundaryMode.AUTO);
+            mPrimaryPlot.getRangeLabelWidget().setText("Derivative Voltage (V/s)");
+        } else {
+            setSerie(MonitorFragment.SERIE_PRIMARY);
+            mPrimaryPlot.setRangeBoundaries(1.0, 5.0, BoundaryMode.FIXED);
+            mPrimaryPlot.getRangeLabelWidget().setText("Voltage");
+        }
+    }
+
+    public void setSerie(int serieId) {
+        mPrimaryPlot.removeSeries(mMonitorControlCallback.getData(mCurrentSerie));
+        mPrimaryPlot.addSeries(mMonitorControlCallback.getData(serieId), mSeries1Format);
+        mCurrentSerie = serieId;
     }
 
     @Override

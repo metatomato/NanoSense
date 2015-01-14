@@ -65,15 +65,12 @@
 -->
     <Button
         android:id="@+id/btn_start_stop"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/btn_start_stop"
+        android:layout_height="@dimen/btn_start_stop"
         android:text="@string/btn_stop"
-        android:textSize="18sp"
+        android:textSize="@dimen/font_size"
         android:layout_centerHorizontal="true"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="15dp"
+        android:padding="@dimen/button_padding"
         android:background="@drawable/circle"
         android:textColor="@color/white_solid"
         android:stateListAnimator="@animator/button_elevation"
@@ -83,7 +80,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="false"
-        android:layout_marginBottom="15dp"
-        android:layout_marginRight="15dp" />
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp" />
 
 </RelativeLayout>

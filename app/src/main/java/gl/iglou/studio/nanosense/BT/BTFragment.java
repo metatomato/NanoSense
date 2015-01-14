@@ -62,10 +62,16 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
     public static final String ACTION_REMOTE_RESPONSE = "remote_response";
     public static final String EXTRA_RESPONSE_CATEGORY = "category";
-    public static final int EXTRA_CAT_CALIBRATION = 0;
-    public static final int EXTRA_CAT_SENSOR_DATA = 1;
-    public static final String EXTRA_CALIBRATION_FEEDBACK = "calibration_feedback";
-    public static final String EXTRA_SENSOR_DATA_FEEDBACK = "sensor_data_feedback";
+    public static final int EXTRA_CAT_SENSOR_DATA = 0;
+    public static final int EXTRA_CAT_CALIBRATION = 1;
+    public static final String EXTRA_DATA_FEEDBACK = "data_feedback";
+
+    private int mCurrentDataMode = 0;
+
+    private final String SENSOR_DATA_PATTERN = "\\d\\.[\\d]{3}";
+    private final String CALIBRATION_DATA_PATTERN = "\\d+\\.[\\d]{3}";
+    private String[] mProcessPattern  = {SENSOR_DATA_PATTERN,CALIBRATION_DATA_PATTERN};
+
 
     private MonitorFragment mDataManager;
     private SettingsFragment mDataProcessor;
@@ -97,7 +103,7 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
 
         if(D) Log.e(TAG, "+++ ON CREATE +++");
 
-        // Get local Bluetooth adapter
+                // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If the adapter is null, then Bluetooth is not supported
@@ -338,11 +344,16 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                     Log.d(TAG, "WRITE " + sendMsg);
                     if(sendMsg.startsWith("K")) {
                         Log.d(TAG, "CALIBRATION!");
+                        mCurrentDataMode = EXTRA_CAT_CALIBRATION;
+                    } else {
+                        mCurrentDataMode = EXTRA_CAT_SENSOR_DATA;
                     }
                     Log.d(TAG, "MESSAGE_WRITE");
                     break;
                 case MESSAGE_READ:
                     //Log.d(TAG,"MESSAGE_READ");
+
+                    String processPattern = mProcessPattern[mCurrentDataMode];
 
                     byte[] data = Arrays.copyOf((byte[])msg.obj,msg.arg1);
 
@@ -355,11 +366,11 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
                         String extracted = mData.substring(0,mark);
                         String[] values = extracted.split("[\\r\\n]+");
                         for(String s : values){
-                            if(s.matches("\\d\\.[\\d]{3}")) {
+                            if(s.matches(processPattern)) {
                                 try {
                                     float value = Float.parseFloat(s);
                                     mDataManager.processData(value);
-                                    broadcastRemoteData(value);
+                                    broadcastRemoteData(mCurrentDataMode,value);
                                     Log.d(TAG, "Broadcasted: " + String.valueOf(value));
                                 } catch (NumberFormatException e) {
                                     Log.d(TAG, "String2Float FAILED! ");
@@ -494,17 +505,10 @@ public class BTFragment extends Fragment implements BTGUIFragment.BTControlCallb
         }
     }
 
-    private void broadcastCategoryResponse(byte[] data) {
+    private void broadcastRemoteData(int mode, float value) {
         Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
-        intent.putExtra(EXTRA_RESPONSE_CATEGORY,EXTRA_CAT_CALIBRATION);
-        intent.putExtra(EXTRA_CALIBRATION_FEEDBACK, data);
-        LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
-    }
-
-    private void broadcastRemoteData(float rate) {
-        Intent intent = new Intent(ACTION_REMOTE_RESPONSE);
-        intent.putExtra(EXTRA_RESPONSE_CATEGORY, EXTRA_CAT_SENSOR_DATA);
-        intent.putExtra(EXTRA_SENSOR_DATA_FEEDBACK,rate);
+        intent.putExtra(EXTRA_RESPONSE_CATEGORY, mode);
+        intent.putExtra(EXTRA_DATA_FEEDBACK,value);
         LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
     }
 

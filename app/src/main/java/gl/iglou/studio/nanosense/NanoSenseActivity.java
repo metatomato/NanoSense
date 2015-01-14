@@ -158,13 +158,11 @@ public class NanoSenseActivity extends ActionBarActivity {
     protected void onStart() {
         super.onStart();
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            if(mDpWidth >= 600.0) {
-                mNavigationDrawer.setBackgroundResource(0);
+        if(mDpWidth >= 600.0) {
+            mNavigationDrawer.setBackgroundResource(0);
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 mContentView.setBackgroundDrawable(getResources().getDrawable(R.drawable.drawer_shadow_reverse_left));
                 mContentView.setPadding(Math.round(5 * mDisplayMetrics.density),0,0,0);
-            } else {
-                //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,GravityCompat.START);
             }
         }
     }

@@ -36,17 +36,23 @@
     <string name="btn_connect_remote_disconnect">DISCONNECT</string>
 
     <!-- SETTINGS -->
+    <string name="alert_calibration">Stop emission before calibration</string>
     <!-- SettingsGUIFragment -->
     <string name="btn_start">START</string>
     <string name="btn_stop">STOP</string>
     <string name="btn_calibrate">CALIBRATE</string>
-    <string name="label_resistance">R(MΩ)</string>
-    <string name="label_current">I(µA)</string>
+    <string name="label_resistance">R(MΩ)=</string>
+    <string name="label_current">Imax(µA)=</string>
     <string name="state_disconnected">DISCONNECTED</string>
     <string name="state_ready">READY</string>
     <string name="state_broadcasting">BROADCASTING</string>
     <string name="connect_first">Connect a remote first!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="set_swipe">Set Swipe</string>
+
+    <!-- MONITOR-->
+    <string name="switch_plot">Switch Plot</string>
+
 
 
 

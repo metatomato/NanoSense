@@ -4,11 +4,15 @@ import android.app.Fragment;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 
@@ -81,6 +85,8 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         mRateFormatter = new DecimalFormat("000.0");
         mSettingsControlCallback = ((NanoSenseActivity)getActivity()).getSettingsController();
     }
@@ -148,8 +154,9 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-
         mSettingsControlCallback.onGUIStart();
+        update();
+
     }
 
     @Override
@@ -186,6 +193,28 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         }
 
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_settings_frag,menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.switch_plot:
+                Toast.makeText(getActivity().getApplicationContext(), "SET SWIPE", Toast.LENGTH_SHORT)
+                        .show();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     public void setCurrent(float current) {
         mSeekBarCurrent.setProgress(SettingsHelper.revertCurrent(current));
@@ -229,28 +258,35 @@ public class SettingsGUIFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void setCalibrationValues() {
+    public void setCalibrationValues(float current, float resistance) {
         String content = getResources().getString(R.string.label_current);
-        content += String.valueOf(mSettingsControlCallback.getRemoteMaxCurrent());
+        content += String.valueOf(Math.round(current));
         mLabelCurrent.setText(content);
         content = getResources().getString(R.string.label_resistance);
-        content += String.valueOf(mSettingsControlCallback.getRemoteResistance());
+        content += String.format("%.2f", resistance);
         mLabelResistance.setText(content);
+    }
+
+    public void resetCalibrationValues() {
+        setCalibrationValues(0.f,0.f);
     }
 
     public void update() {
         int state = mSettingsControlCallback.getState();
         setLabelState(state);
         setEmissionButton(state);
-        setCalibrationValues();
+        setCalibrationValues(mSettingsControlCallback.getRemoteMaxCurrent(),
+                mSettingsControlCallback.getRemoteResistance());
         setCurrent(mSettingsControlCallback.getCurrent());
         setGain(mSettingsControlCallback.getGain());
         setSwipe(mSettingsControlCallback.getSwipe());
-        setDataRateValue(mSettingsControlCallback.getDataHighRate(),mSettingsControlCallback.getDataLowRate());
+        setDataRateValue(mSettingsControlCallback.getDataHighRate(),
+                mSettingsControlCallback.getDataLowRate());
     }
 
     public void setDataRateValue(float highRate, float lowRate) {
-        mLabelReceivingValue.setText(mRateFormatter.format(highRate) + " | " +  mRateFormatter.format(lowRate));
+        mLabelReceivingValue.setText(mRateFormatter.format(highRate) + " | "
+                +  mRateFormatter.format(lowRate));
     }
 
     public interface SettingsControlCallback {

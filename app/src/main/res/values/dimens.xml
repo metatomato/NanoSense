@@ -24,7 +24,6 @@
     <dimen name="legend_text_font_size">20dp</dimen>
 
 
-
     <!-- COMMON FRAG DIMEN -->
     <dimen name="font_size_small">10sp</dimen>
     <dimen name="font_size">15sp</dimen>
@@ -36,7 +35,7 @@
     <dimen name="left_margin">15dp</dimen>
     <dimen name="left_margin_large">30dp</dimen>
     <dimen name="left_margin_xlarge">45dp</dimen>
-
+    <dimen name="button_padding">10dp</dimen>
 
     <!-- MP_FRAG DIMEN -->
     <dimen name="imageView_album_art_size">260dp</dimen>
@@ -56,8 +55,7 @@
     <dimen name="frame_value_size">100dp</dimen>
     <dimen name="frame_top_margin">25dp</dimen>
 
-
-
-
+    <!-- MONITOR_FRAG DIMEN -->
+    <dimen name="btn_start_stop">80dp</dimen>
 
 </resources>

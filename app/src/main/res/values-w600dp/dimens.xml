@@ -33,7 +33,9 @@
     <dimen name="right_margin_large">45dp</dimen>
     <dimen name="right_margin_xlarge">90dp</dimen>
     <dimen name="left_margin">30dp</dimen>
+    <dimen name="left_margin_large">60dp</dimen>
     <dimen name="left_margin_xlarge">90dp</dimen>
+    <dimen name="button_padding">15dp</dimen>
 
     <!-- MP_FRAG DIMEN -->
     <dimen name="imageView_album_art_size">320dp</dimen>
@@ -52,5 +54,8 @@
     <dimen name="btn_seekbar_size">90dp</dimen>
     <dimen name="frame_value_size">140dp</dimen>
     <dimen name="frame_top_margin">35dp</dimen>
+
+    <!-- MONITOR_FRAG DIMEN -->
+    <dimen name="btn_start_stop">100dp</dimen>
 
 </resources>

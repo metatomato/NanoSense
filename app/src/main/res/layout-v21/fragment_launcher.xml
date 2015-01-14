@@ -12,32 +12,28 @@
         android:id="@+id/launcher_btn_0"
         android:layout_width="@dimen/launcher_icon"
         android:layout_height="@dimen/launcher_icon"
-        android:src="@drawable/selector_icon_mp"
-        android:background="@null"
+        android:src="@drawable/icon_mp"
         />
 
     <ImageButton
         android:id="@+id/launcher_btn_1"
         android:layout_width="@dimen/launcher_icon"
         android:layout_height="@dimen/launcher_icon"
-        android:src="@drawable/selector_icon_bt"
-        android:background="@null"
+        android:src="@drawable/icon_bt"
         />
 
     <ImageButton
         android:id="@+id/launcher_btn_2"
         android:layout_width="@dimen/launcher_icon"
         android:layout_height="@dimen/launcher_icon"
-        android:src="@drawable/selector_icon_settings"
-        android:background="@null"
+        android:src="@drawable/icon_settings"
         />
 
     <ImageButton
         android:id="@+id/launcher_btn_3"
         android:layout_width="@dimen/launcher_icon"
         android:layout_height="@dimen/launcher_icon"
-        android:src="@drawable/selector_icon_monitor"
-        android:background="@null"
+        android:src="@drawable/icon_monitor"
         />
 
 </LinearLayout>

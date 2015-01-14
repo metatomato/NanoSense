@@ -67,7 +67,6 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
     private int mCalculatedCurrent;
     private int mCalculatedGain;
 
-    private boolean mWaitingForCalibrationFeedback = false;
     private float mCalibrationResistance = 0.f;
     private float mCalibrationCurrent = 0.f;
 
@@ -117,20 +116,16 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
             switch (intent.getAction()) {
                 case BTFragment.ACTION_REMOTE_RESPONSE:
                     int cat = intent.getIntExtra(BTFragment.EXTRA_RESPONSE_CATEGORY, -1);
+                    float data = intent.getFloatExtra(BTFragment.EXTRA_DATA_FEEDBACK, 0.f);
                     switch (cat) {
                         case BTFragment.EXTRA_CAT_CALIBRATION:
-                            byte[] data = intent.getByteArrayExtra(BTFragment.EXTRA_CALIBRATION_FEEDBACK);
-                            String sData = new String(data, Charset.forName("UTF-8"));
-                            Log.d(TAG, "Local Broadcastreceived: " + sData);
+                            Log.d(TAG, "Local Broadcastreceived: " + String.valueOf(data));
+                            updateCalibrationValues(data);
                             break;
                         case BTFragment.EXTRA_CAT_SENSOR_DATA:
-                            float value = intent.getFloatExtra(BTFragment.EXTRA_SENSOR_DATA_FEEDBACK, 0.f);
-                            if(mWaitingForCalibrationFeedback) {
-                                updateCalibrationValues(value);
-                            } else {
-                                mHighFrequencyData.add(value);
-                                mLowFrequencyData.add(value);
-                            }
+                            float value = intent.getFloatExtra(BTFragment.EXTRA_DATA_FEEDBACK, 0.f);
+                            mHighFrequencyData.add(value);
+                            mLowFrequencyData.add(value);
                             break;
                     }
                     break;
@@ -235,22 +230,27 @@ public class SettingsFragment extends Fragment implements SettingsGUIFragment.Se
         }
     }
 
-    private void updateCalibrationValues(float resistance) {
-        mCalibrationResistance = resistance;
-        calculateCalibrationCurrent();
-        mWaitingForCalibrationFeedback = false;
+    private void updateCalibrationValues(float voltage) {
+        calculateCalibrationValues(voltage);
         Log.d(TAG,"Resistance: " + String.valueOf(mCalibrationResistance) + "   current: "
                 + String.valueOf(mCalibrationCurrent) );
+        mSettingsGUIFragment.setCalibrationValues(mCalibrationCurrent,mCalibrationResistance);
     }
 
-    private void calculateCalibrationCurrent() {
+    private void calculateCalibrationValues(float voltage) {
+        mCalibrationResistance  = voltage / mCurrentRemoteValue;
         mCalibrationCurrent = 22.f / mCalibrationResistance;
     }
 
 //SettingsControlCallback Impelmentation
     public void onCalibrateClick() {
-        mWaitingForCalibrationFeedback = true;
-        mMessagingManager.sendMessage(MSG_CALIBRATE);
+        if( getState() == STATE_BROADCASTING) {
+            Toast.makeText(getActivity(),getResources().getString(R.string.alert_calibration)
+                    ,Toast.LENGTH_SHORT).show();
+        } else {
+            mSettingsGUIFragment.resetCalibrationValues();
+            mMessagingManager.sendMessage(MSG_CALIBRATE);
+        }
     }
 
     public void onSetCurrent(float current) {
