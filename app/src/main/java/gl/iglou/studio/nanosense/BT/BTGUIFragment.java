@@ -174,7 +174,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
     private void setRemoteSpinner() {
         updateDeviceList();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item, mDeviceSelectionList);
+                R.layout.nanosense_spinner_item, mDeviceSelectionList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerRemotes.setAdapter(adapter);
     }
@@ -199,7 +199,7 @@ public class BTGUIFragment extends Fragment implements CompoundButton.OnCheckedC
         else
             mUuidSelectionList = new ArrayList<>();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item, mUuidSelectionList);
+                R.layout.nanosense_spinner_gray, mUuidSelectionList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerUuids.setAdapter(adapter);
         mSpinnerUuids.setSelection( mUuidSelectionList.size() - 1 );

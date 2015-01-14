@@ -52,8 +52,13 @@
 
     <!-- MONITOR-->
     <string name="switch_plot">Switch Plot</string>
+    <string name="inverse_data">Inverse Data</string>
 
-
+    <!-- MP -->
+    <string name="btn_play">PLAY</string>
+    <string name="btn_play_stop">STOP</string>
+    <string name="btn_next">NEXT</string>
+    <string name="btn_prev">PREV</string>
 
 
 </resources>

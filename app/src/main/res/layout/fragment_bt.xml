@@ -71,16 +71,23 @@
         android:textSize="20sp"
         android:paddingLeft="10dp" />
 
-    <Spinner
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner_remote"
+        android:id="@+id/spinner_remote_frame"
+        android:background="@color/white_solid"
+        android:elevation="4dp"
         android:layout_below="@+id/label_section_bt_remote"
         android:layout_alignParentStart="true"
         android:layout_marginTop="@dimen/top_margin"
-        android:spinnerMode="dropdown"
-        android:layout_marginLeft="@dimen/left_margin"
-        android:layout_marginRight="@dimen/right_margin" />
+        android:layout_marginLeft="@dimen/left_margin">
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_remote"
+            android:spinnerMode="dropdown"
+        />
+    </FrameLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -88,7 +95,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="State:"
         android:id="@+id/label_state"
-        android:layout_below="@+id/spinner_remote"
+        android:layout_below="@+id/spinner_remote_frame"
         android:layout_alignParentStart="true"
         android:layout_marginTop="@dimen/top_margin"
         android:layout_marginLeft="@dimen/left_margin"
@@ -159,13 +166,22 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/top_margin_large" />
 
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_uuids_frame"
+        android:background="@color/white_solid"
+        android:elevation="4dp"
+        android:layout_alignTop="@+id/label_uuid"
+        android:layout_marginLeft="@dimen/left_margin"
+        android:layout_marginRight="@dimen/right_margin"
+        android:layout_toRightOf="@+id/label_uuid">
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinner_uuids"
-        android:layout_alignTop="@+id/label_uuid"
         android:spinnerMode="dropdown"
-        android:layout_marginLeft="@dimen/left_margin"
-        android:layout_toRightOf="@+id/label_uuid" />
+         />
+    </FrameLayout>
 
 </RelativeLayout>

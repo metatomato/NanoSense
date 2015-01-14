@@ -8,4 +8,10 @@
         android:title="@string/switch_plot"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/inverse_data"
+        android:title="@string/inverse_data"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
 </menu>

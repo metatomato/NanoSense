@@ -153,7 +153,11 @@ public class MonitorGUIFragment extends Fragment {
                 Toast.makeText(getActivity().getApplicationContext(), "SWITCH PLOT", Toast.LENGTH_SHORT)
                         .show();
                 switchSerie();
-
+                return true;
+            case R.id.inverse_data:
+                mMonitorControlCallback.onInverseDataClick();
+                Toast.makeText(getActivity().getApplicationContext(), "DATA REVERSED", Toast.LENGTH_SHORT)
+                        .show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -210,6 +214,7 @@ public class MonitorGUIFragment extends Fragment {
         public void onGUIStart();
         public void onGUIStop();
         public int onStartStopClick();
+        public void onInverseDataClick();
     }
 
 }

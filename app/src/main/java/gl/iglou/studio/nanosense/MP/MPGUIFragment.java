@@ -68,11 +68,19 @@ public class MPGUIFragment extends Fragment implements View.OnClickListener {
                 getResources().getColor(R.color.color_tertiary));
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateGUI();
+    }
+
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_play:
                 mMPControlCallback.onPlayClick();
+                updatePlayButtonLabel();
                 break;
             case R.id.btn_next:
                 mMPControlCallback.onNextClick();
@@ -87,11 +95,25 @@ public class MPGUIFragment extends Fragment implements View.OnClickListener {
         ImageViewAlbumArt.setImageBitmap(image);
     }
 
+    public void updatePlayButtonLabel() {
+        int state = mMPControlCallback.getMPState();
+        if(state == MPFragment.STATE_PLAYER_PLAYING) {
+            mBtnPlay.setText(getResources().getString(R.string.btn_play_stop));
+        } else {
+            mBtnPlay.setText(getResources().getString(R.string.btn_play));
+        }
+    }
+
+    public void updateGUI() {
+        updatePlayButtonLabel();
+        mMPControlCallback.updateAlbumArt();
+    }
 
     public interface MPControlCallback {
         public void onPlayClick();
         public void onNextClick();
         public void onPrevClick();
         public void updateAlbumArt();
+        public int getMPState();
     }
 }

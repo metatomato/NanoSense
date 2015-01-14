@@ -22,7 +22,8 @@ import java.util.HashSet;
 import gl.iglou.studio.nanosense.R;
 
 
-public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallback, MPInterface {
+public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallback, MPInterface,
+        MediaPlayer.OnCompletionListener{
 
     public static final String TAG = "MPFragment";
 
@@ -60,6 +61,8 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
         super.onCreate(savedInstanceState);
 
         mPlaylist = new int[]{MP3_DEFAULT_0, MP3_DEFAULT_1, MP3_DEFAULT_2};
+
+
     }
 
     @Override
@@ -74,12 +77,21 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
         mMetaRetriver = new MediaMetadataRetriever();
 
         mMediaPlayer = MediaPlayer.create(getActivity(), R.raw.bebop);
+
+        mMediaPlayer.setOnCompletionListener(this);
     }
 
     public void setMPGUIFrag(MPGUIFragment frag) {
         mMPGUIFragment = frag;
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        stop();
+        if(mMPGUIFragment.isAdded()) {
+            mMPGUIFragment.updateGUI();
+        }
+    }
 
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -142,6 +154,7 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
         try{
             mMediaPlayer.setDataSource(getActivity(),fileURI);
             mMediaPlayer.prepare();
+            updateAlbumArt();
         }
         catch(Exception e){
             Log.e(TAG, "MP Error setting data source", e);
@@ -149,7 +162,6 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
     }
 
     private void play() {
-        updateAlbumArt();
         mMediaPlayer.seekTo(0);
         mMediaPlayer.start();
         mPlayerState = STATE_PLAYER_PLAYING;
@@ -170,11 +182,19 @@ public class MPFragment extends Fragment implements MPGUIFragment.MPControlCallb
 
     public void onNextClick() {
         getNext();
-        play();
+        if(mPlayerState == STATE_PLAYER_PLAYING) {
+            play();
+        }
     }
 
     public void onPrevClick() {
         getPrev();
-        play();
+        if(mPlayerState == STATE_PLAYER_PLAYING) {
+            play();
+        }
+    }
+
+    public int getMPState() {
+        return mPlayerState;
     }
 }

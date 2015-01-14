@@ -152,6 +152,14 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         return mSettingsControlCallback.getState();
     }
 
+    public void onInverseDataClick() {
+        if(mReverseData) {
+            mReverseData = false;
+        } else {
+            mReverseData = true;
+        }
+    }
+
 
     long getTick() {
         return System.currentTimeMillis() - mStartTime;
@@ -172,23 +180,6 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
                 mDataStart = System.currentTimeMillis();
             }
         }else {
-            /*
-            if (System.currentTimeMillis() - mDataStart > 1000L){
-                if (value < 10.f) {
-                    float deltaLimit = 1.f;
-                    float lastData = mSerie.getY(mSerie.size() - 1).floatValue();
-                    float delta = Math.abs(value - lastData);
-                    if (delta < deltaLimit) {
-                        updateSerie(bufferMean());
-                        updateBuffer(value);
-                    }
-                } else {
-                    Log.d(TAG, "Catch out-of-range value: " + String.valueOf(value));
-                }
-            } else {
-                updateBuffer(value);
-            }
-            */
             updateSerie(SERIE_PRIMARY,smoothData());
             float derivate = smoothDerivateData();
             updateSerie(SERIE_SECONDARY,derivate);
@@ -199,7 +190,6 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
                     mLastTrigger = System.currentTimeMillis();
                 }
             }
-
             updateBuffer(data);
         }
     }
