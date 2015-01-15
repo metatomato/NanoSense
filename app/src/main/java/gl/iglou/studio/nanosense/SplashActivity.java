@@ -19,15 +19,20 @@ public class SplashActivity extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 NextActivity();
             }
         }, SPLASH_TIME_OUT);
     }
-
 
     public void NextActivity() {
         Intent i = new Intent(SplashActivity.this, NanoSenseActivity.class);

@@ -58,4 +58,7 @@
     <!-- MONITOR_FRAG DIMEN -->
     <dimen name="btn_start_stop">100dp</dimen>
 
+    <!-- SPLASH DIMEN -->
+    <dimen name="logo_splash">520dp</dimen>
+
 </resources>

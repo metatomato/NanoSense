@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/imageView_album_art_top_margin"
-        android:src="@drawable/nanomade_splash_2k"
+        android:src="@drawable/nanomade"
         android:elevation="4dp"
         android:background="@color/white_solid"
         android:contentDescription="album_artwork" />
