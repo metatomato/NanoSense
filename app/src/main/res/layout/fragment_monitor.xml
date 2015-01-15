@@ -67,7 +67,7 @@
         android:id="@+id/btn_start_stop"
         android:layout_width="@dimen/btn_start_stop"
         android:layout_height="@dimen/btn_start_stop"
-        android:text="@string/btn_stop"
+        android:text="@string/btn_start"
         android:textSize="@dimen/font_size"
         android:layout_centerHorizontal="true"
         android:padding="@dimen/button_padding"

@@ -147,8 +147,11 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         mGeneratorScheduler.removeCallbacks(mGeneratorSchedulerTask);
     }
 
-    public int onStartStopClick() {
+    public void onStartStopClick() {
         mSettingsControlCallback.onEmissionClick();
+    }
+
+    public int getEmissionState() {
         return mSettingsControlCallback.getState();
     }
 
@@ -160,10 +163,6 @@ public class MonitorFragment extends Fragment implements MonitorGUIFragment.Moni
         }
     }
 
-
-    long getTick() {
-        return System.currentTimeMillis() - mStartTime;
-    }
 
 
     public void processData(float value) {

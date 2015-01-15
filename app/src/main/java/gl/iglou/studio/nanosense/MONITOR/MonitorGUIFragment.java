@@ -62,9 +62,7 @@ public class MonitorGUIFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        launchPlotScheduler();
 
-        mMonitorControlCallback.onGUIStart();
     }
 
     @Override
@@ -86,16 +84,8 @@ public class MonitorGUIFragment extends Fragment {
         mStartStopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int state = mMonitorControlCallback.onStartStopClick();
-                if(state == SettingsFragment.STATE_BROADCASTING) {
-                    ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
-                            getResources().getColor(R.color.color_tertiary));
-                    mStartStopBtn.setText(getResources().getString(R.string.btn_stop));
-                } else {
-                    ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
-                            getResources().getColor(R.color.color_primary));
-                    mStartStopBtn.setText(getResources().getString(R.string.btn_start));
-                }
+            mMonitorControlCallback.onStartStopClick();
+            updateButtonState();
             }
         });
 
@@ -140,6 +130,23 @@ public class MonitorGUIFragment extends Fragment {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+
+        mMonitorControlCallback.onGUIStop();
+        mPlotScheduler.removeCallbacks(mPlotSchedulerTask);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        updateButtonState();
+        launchPlotScheduler();
+        mMonitorControlCallback.onGUIStart();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_monitor_frag,menu);
@@ -177,6 +184,19 @@ public class MonitorGUIFragment extends Fragment {
         mPlotScheduler.postDelayed( mPlotSchedulerTask, 0L);
     }
 
+    private void updateButtonState() {
+        int state = mMonitorControlCallback.getEmissionState();
+
+        if(state == SettingsFragment.STATE_BROADCASTING) {
+            ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
+                    getResources().getColor(R.color.color_tertiary));
+            mStartStopBtn.setText(getResources().getString(R.string.btn_stop));
+        } else {
+            ((GradientDrawable)mStartStopBtn.getBackground()).setColor(
+                    getResources().getColor(R.color.color_primary));
+            mStartStopBtn.setText(getResources().getString(R.string.btn_start));
+        }
+    }
 
     public void updateExtrema(float yMin, float yMax) {
         mPrimaryPlot.setRangeBoundaries(yMin, yMax, BoundaryMode.AUTO);
@@ -201,20 +221,15 @@ public class MonitorGUIFragment extends Fragment {
         mCurrentSerie = serieId;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
 
-        mMonitorControlCallback.onGUIStop();
-        mPlotScheduler.removeCallbacks(mPlotSchedulerTask);
-    }
 
     public interface MonitorControlCallback {
         public XYSeries getData(int serieId);
         public void onGUIStart();
         public void onGUIStop();
-        public int onStartStopClick();
+        public void onStartStopClick();
         public void onInverseDataClick();
+        public int getEmissionState();
     }
 
 }

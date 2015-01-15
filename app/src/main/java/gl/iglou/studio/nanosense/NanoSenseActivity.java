@@ -3,6 +3,7 @@ package gl.iglou.studio.nanosense;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -19,6 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.view.WindowManager;
+
+import java.util.logging.LogRecord;
 
 import gl.iglou.studio.nanosense.BT.BTFragment;
 import gl.iglou.studio.nanosense.BT.BTGUIFragment;
@@ -129,6 +132,8 @@ public class NanoSenseActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
 
+
+
         //Start BTFragment
         FragmentManager fm = getFragmentManager();
         if(mBTFragment == null) {
@@ -159,7 +164,9 @@ public class NanoSenseActivity extends ActionBarActivity {
         super.onStart();
 
         if(mDpWidth >= 600.0) {
+            //Disable the drawer shadow (shadow already attached to contentView)
             mNavigationDrawer.setBackgroundResource(0);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 mContentView.setBackgroundDrawable(getResources().getDrawable(R.drawable.drawer_shadow_reverse_left));
                 mContentView.setPadding(Math.round(5 * mDisplayMetrics.density),0,0,0);
@@ -207,9 +214,21 @@ public class NanoSenseActivity extends ActionBarActivity {
                 .commit();
 
         getSupportActionBar().setTitle(mFragmentLabel[fragmentId]);
+
+        closeDrawer();
     }
 
 
+    private void closeDrawer() {
+        Handler scheduler = new Handler();
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                mDrawerLayout.closeDrawers();
+            }
+        };
+        scheduler.postDelayed( task, 150L);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
